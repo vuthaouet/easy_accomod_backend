@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Address;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -54,7 +55,7 @@ class UserController extends Controller
         return response()->json($user);
     }
     /**
-     * Hiển thị trạng thái người dùng
+     * Hiển thị trạng thái chủ nhà trọ
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
@@ -64,6 +65,18 @@ class UserController extends Controller
         $user = new User;
         $user = $user->getRole($id);
         return response()->json($user);
+    }
+    /**
+     * test
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function test($id)
+    {
+        $address = new Address;
+        $address =$address->getAddressByUserId($id);
+        return response()->json($address);
     }
 
 
@@ -87,7 +100,10 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $address = new Address;
+        $user = new User;
+        $user = $user->getUserById($id);
+        $address =$address->getAddressById($id);
     }
 
     /**
@@ -100,4 +116,5 @@ class UserController extends Controller
     {
         //
     }
+
 }

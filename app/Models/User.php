@@ -8,10 +8,12 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Laravel\Passport\HasApiTokens;
+
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasApiTokens,HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -43,10 +45,8 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function Address()
-    {
-        return $this->hasOne('App\Models\Address', 'address_id');
-    }
+
+
 
     // Tạo người dùng mới
     function storeUser(Request $request, $address_id){
@@ -55,10 +55,19 @@ class User extends Authenticatable
         $this->email=$request->email;
         $this->phone_number=$request->phone_number;
         $this->address_id=$address_id;
-        $this->role_id=$request->role_id;
+
         $this->password=bcrypt($request->password);
         $this->cmnd=$request->cmnd;
+        if($request->role == "owner")
+        {
+            $this->role_id=2;
+        }
+        else{
+            $this->role_id=3;
+        }
+
         $this->save();
+
     }
 
 
@@ -69,6 +78,11 @@ class User extends Authenticatable
             ->where('id', $id)
             ->get();
         return $user;
+    }
+    //Lấy người dùng theo id
+    //
+    function getUserById($id){
+        return User::find($id);
     }
 
 }

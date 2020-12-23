@@ -9,7 +9,10 @@ use Illuminate\Support\Facades\DB;
 
 class Address extends Model
 {
-
+    public function User()
+    {
+        return $this->hasOne('App\Models\User', 'address_id');
+    }
     use HasFactory;
     public $timestamps = false;
     protected $primaryKey = 'id';
@@ -24,15 +27,21 @@ class Address extends Model
     }
     //Lấy ra địa chỉ
     function getAddressById($address_id){
-       return DB::table('users')->where('id', $address_id);
+       return Address::find($address_id);
+    }
+    //Lấy ra địa chỉ theo User_id
+    function getAddressByUserId($user_id){
+        $user = User::find($user_id);
+        return Address::find($user->address_id);
+
     }
     //Update
-    function updateAddress(Address $newAdd){
-        $this->number = $request->number;
-        $this->street = $request->street;
-        $this->wards = $request->wards;
-        $this->district = $request->district;
-        $this->provinces = $request->provinces;
-        $this->save();
-    }
+//    function updateAddress(Address $newAdd){
+//        $this->number = $request->number;
+//        $this->street = $request->street;
+//        $this->wards = $request->wards;
+//        $this->district = $request->district;
+//        $this->provinces = $request->provinces;
+//        $this->save();
+//    }
 }
