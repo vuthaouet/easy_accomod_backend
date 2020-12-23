@@ -11,6 +11,9 @@ use Illuminate\Http\Request;
 use Laravel\Passport\HasApiTokens;
 
 
+/**
+ * @method static where(string $string, mixed $email)
+ */
 class User extends Authenticatable
 {
     use HasApiTokens,HasFactory, Notifiable;

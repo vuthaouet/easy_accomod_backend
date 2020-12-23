@@ -1,8 +1,8 @@
 <?php
 
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ResetPasswordController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -43,3 +43,6 @@ Route::group([
         Route::get('user', [AuthController::class, 'user']);
     });
 });
+
+Route::post('reset-password',[ResetPasswordController::class, 'sendMail'] )->name('password.reset');
+Route::put('reset-password/{token}', [ResetPasswordController::class, 'reset']);
