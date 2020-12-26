@@ -16,7 +16,7 @@ class CreateFurnitureTable extends Migration
         Schema::create('furnitures', function (Blueprint $table) {
             $table->increments('id');
             $table->char('name', 50);
-            $table->char('status', 50)->default(null);
+            $table->char('status', 50)->default(null)->nullable();
         });
     }
 

@@ -18,11 +18,12 @@ class Address extends Model
     protected $primaryKey = 'id';
     //Tạo mới địa chỉ
     function storeAddress(Request $request){
-        $this->number = $request->number;
-        $this->street = $request->street;
-        $this->wards = $request->wards;
-        $this->district = $request->district;
-        $this->provinces = $request->provinces;
+        $arr = explode(",", $request->address);
+        $this->number = $arr[0];
+        $this->street =$arr[1];
+        $this->wards = $arr[2];
+        $this->district = $arr[3];
+        $this->provinces = $arr[4];
         $this->save();
     }
     //Lấy ra địa chỉ
@@ -35,13 +36,4 @@ class Address extends Model
         return Address::find($user->address_id);
 
     }
-    //Update
-//    function updateAddress(Address $newAdd){
-//        $this->number = $request->number;
-//        $this->street = $request->street;
-//        $this->wards = $request->wards;
-//        $this->district = $request->district;
-//        $this->provinces = $request->provinces;
-//        $this->save();
-//    }
 }

@@ -15,7 +15,6 @@ class CreateBoardingsTable extends Migration
     {
         Schema::create('boardings', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('place_around_id')->unsigned();
             $table->bigInteger('price');
             $table->float('area', 8, 2);
             $table->integer('type_id')->unsigned();
@@ -23,9 +22,11 @@ class CreateBoardingsTable extends Migration
             $table->json('images');
             $table->string('description');
             $table->tinyInteger('is_owner');
+            $table->integer('electricity_water');
+            $table->bigInteger('electricity_price')->nullable();
+            $table->bigInteger('water_price')->nullable();
             $table->foreign('address_id')->references('id')->on('addresses');
             $table->foreign('type_id')->references('id')->on('type_boardings');
-            $table->foreign('place_around_id')->references('id')->on('place_arounds');
 
         });
     }

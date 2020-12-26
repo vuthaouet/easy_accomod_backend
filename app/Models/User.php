@@ -18,6 +18,19 @@ class User extends Authenticatable
 {
     use HasApiTokens,HasFactory, Notifiable;
 
+
+    //xác định quan hệ với role
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class);
+    }
+
+    //xác định quan hệ với post
+    public function Post()
+    {
+        return $this->hasOne('App\Models\Post', 'user_id');
+    }
+
     /**
      * The attributes that are mass assignable.
      *
@@ -86,6 +99,38 @@ class User extends Authenticatable
     //
     function getUserById($id){
         return User::find($id);
+    }
+
+    //Phân quyền
+
+    public function authorizeRoles($roles_id)
+    {
+        if (is_array($roles_id)) {
+            return $this->hasAnyRole($roles_id) ||
+                abort(401, 'This action is unauthorized.');
+        }
+        return $this->hasRole($roles_id) ||
+            abort(401, 'This action is unauthorized.');
+    }
+    /**
+     * Check multiple roles
+     * @param array $roles_id
+     */
+    public function hasAnyRole($roles_id)
+    {
+        return null !== $this->roles()->whereIn(‘role_id’, $roles_id)->first();
+    }
+    /**
+     * Check one role
+     * @param string $role
+     */
+    public function hasRole($roles_id)
+    {
+        return null !== $this->roles()->where(‘role_id’, $roles_id)->first();
+    }
+
+    public function approvalUser($id){
+        $this->status = 1;
     }
 
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Address;
 use App\Models\User;
+use Cassandra\Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -15,6 +16,7 @@ class AuthController extends Controller
      */
     public function signup(Request $request)
     {
+        try{
         $request->validate([
             'phone_number' => 'required|min:10|numeric',
             'email' => 'required|email|unique:users,email',
@@ -44,8 +46,14 @@ class AuthController extends Controller
         $user = new User;
         $user->storeUser($request, $address->id);
         return response()->json([
-            'message' => 'Successfully created user!'
+            'message' => 'Đăng ký thành công!'
         ], 201);
+        }
+        catch (Exception $e) {
+            return response()->json([
+                'message' => 'Đăng ký không thành công!'
+            ], 401);
+        }
     }
 
     /**
@@ -62,7 +70,7 @@ class AuthController extends Controller
         $credentials = request(['email', 'password']);
         if(!Auth::attempt($credentials))
             return response()->json([
-                'message' => 'Unauthorized'
+                'message' => 'Đăng nhập không thành công'
             ], 401);
         $user = $request->user();
         $tokenResult = $user->createToken('Personal Access Token');
@@ -71,12 +79,13 @@ class AuthController extends Controller
             $token->expires_at = Carbon::now()->addWeeks(1);
         $token->save();
         return response()->json([
+            'message' => 'Đăng nhập thành công',
             'access_token' => $tokenResult->accessToken,
             'token_type' => 'Bearer',
             'expires_at' => Carbon::parse(
                 $tokenResult->token->expires_at
-            )->toDateTimeString()
-        ]);
+            )->toDateTimeString(),
+        ],201);
     }
 
     /**
