@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use DB;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 
 class PostController extends Controller
 {
@@ -31,7 +32,7 @@ class PostController extends Controller
         if (Auth::Check() && Auth::User()->role_id == 2 and Auth::User()->status == 1) {
             try {
                 $request->validate([
-                    'title' => 'required',
+                    'title' => 'required|unique:posts',
                     'address' => 'required',
                     'price' => 'required',
                     'description' => 'required',
@@ -39,6 +40,7 @@ class PostController extends Controller
                 ],
                     [
                         'title.required' => 'Nhập tiêu đề bài đăng',
+                        'title.unique'  => 'Tiêu đề đã tồn tại',
                         'price.required' => 'Nhập giá thuê phòng trọ',
                         'description.required' => 'Nhập mô tả ngắn cho phòng trọ',
                         'address.required' => 'Nhập  địa chỉ phòng trọ ',
@@ -102,6 +104,7 @@ class PostController extends Controller
                 $post->title = $request->title;
                 $post->boarding_id = $boarding->id;
                 $post->number_date = $request->number_date;
+                $post->slug = Str::slug($post->title, '-');
                 $post->save();
                 //tạo hóa đơn
                 $payment = new Payment;
@@ -513,6 +516,13 @@ class PostController extends Controller
     }
     // Nhận thông báo bài được duyệt
     //Xem thống kê lượt xem
+        //Thống kê bài post theo ngày
+    public function thongKeDay($post_id){
+        $post = Post::find(1);
+
+        $sum = visits($post)->count();
+        return response()->json($sum);
+    }
     //chat
     //Tìm kiếm phòng trọ
     //Thêm Review/bình luận

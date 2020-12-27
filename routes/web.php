@@ -89,5 +89,7 @@ Route::group(['prefix'=>'post'], function () {
     Route::get('/{post_id}/unlike_post',[PostController::class,'UnLikePost']);
     //Lấy ra lượt like của post
     Route::get('/{user_id}/like_post',[PostController::class, 'getLikePost']);
+    //lấy thống kê
+    Route::get('/{post_id}/thong_ke',[PostController::class,'thongKeDay']);
 
 });
