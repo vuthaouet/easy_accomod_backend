@@ -72,19 +72,19 @@ class AuthController extends Controller
             return response()->json([
                 'message' => 'Đăng nhập không thành công'
             ], 401);
-        $user = $request->user();
-        $tokenResult = $user->createToken('Personal Access Token');
-        $token = $tokenResult->token;
-        if ($request->remember_me)
-            $token->expires_at = Carbon::now()->addWeeks(1);
-        $token->save();
+        // $user = $request->user();
+        // $tokenResult = $user->createToken('Personal Access Token');
+        // $token = $tokenResult->token;
+        // if ($request->remember_me)
+        //     $token->expires_at = Carbon::now()->addWeeks(1);
+        // $token->save();
         return response()->json([
             'message' => 'Đăng nhập thành công',
-            'access_token' => $tokenResult->accessToken,
-            'token_type' => 'Bearer',
-            'expires_at' => Carbon::parse(
-                $tokenResult->token->expires_at
-            )->toDateTimeString(),
+            // 'access_token' => $tokenResult->accessToken,
+            // 'token_type' => 'Bearer',
+            // 'expires_at' => Carbon::parse(
+            //     $tokenResult->token->expires_at
+            // )->toDateTimeString(),
         ],201);
     }
 
