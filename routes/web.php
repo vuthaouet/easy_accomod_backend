@@ -32,7 +32,9 @@ Route::group(['prefix'=>'user'], function () {
     //Phê duyệt chủ trọ
     Route::get('/{id}/approval_user',[UserController::class, 'approvalUser']);
     //Lấy số tiền cần trả của 1 user
-    Route::get('/{$user_id}/payment_user',[PostController::class, 'paymentUser']);
+    Route::get('/{user_id}/payment_user',[PostController::class, 'paymentUser']);
+    //Lấy ra sanh sách yêu thích của một user
+    Route::get('/{user_id}/post_like',[PostController::class, 'getPostLike']);
 });
 
 
@@ -81,4 +83,11 @@ Route::group(['prefix'=>'post'], function () {
     Route::get('/{user_id}/expired_post_of_user',[PostController::class, 'getExpiredPostOfUser']);
     //gia hạn bài đăng
     Route::post('/{post_id}/post_extension',[PostController::class,'postExtension']);
+    //Lưu vào danh sach yêu thích
+    Route::get('/{post_id}/post_like_post',[PostController::class,'postLikePost']);
+    //Xóa khỏi danh sách yêu thích
+    Route::get('/{post_id}/unlike_post',[PostController::class,'UnLikePost']);
+    //Lấy ra lượt like của post
+    Route::get('/{user_id}/like_post',[PostController::class, 'getLikePost']);
+
 });

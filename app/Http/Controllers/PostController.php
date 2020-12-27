@@ -461,10 +461,10 @@ class PostController extends Controller
         ], 201);
     }
     //Lưu vào danh sach yêu thích
-    public function postLikePost($user_id,$post_id){
+    public function postLikePost($post_id){
         $like_post = new LikePost;
         $like_post->post_id = $post_id;
-        $like_post->user_id = $user_id;
+        $like_post->user_id = Auth::User()->id;
         $like_post->save();
         return response()->json([
             'message' => 'Thích thành công!',
@@ -473,7 +473,7 @@ class PostController extends Controller
 
     }
     //Xóa vào danh sach yêu thích
-    public function UnpostLikePost($user_id,$post_id){
+    public function UnLikePost($user_id,$post_id){
         $like_post = DB::table('like_posts')->where('post_id',$post_id)->where('user_id',$user_id)->get();
         if (! $like_post) {
             return response()
@@ -486,7 +486,31 @@ class PostController extends Controller
         ], 201);
 
     }
+    // Lấy ra lượt like của post
+    public function getLikePost(){
+        $like_post = DB::table('like_posts')
+                        ->select('post_id', DB::raw('count(*) as total_likes'))
+                        ->groupBy('post_id')
+                        ->orderBy('count(*)', 'DESC')
+                        ->get();
+        return response()->json([
+            'message' => $like_post,
+        ], 201);
+    }
     // Lấy ra sanh sách yêu thích của một user
+    public function getPostLike($user_id)
+    {
+        $like_post_id = DB::table('like_posts')->select('post_id')->where('user_id',$user_id)->get();
+        $post_like = [];
+        foreach($like_post_id as $id)
+        {
+            $post_like[] = Post::find($id);
+        }
+        return response()->json([
+            'message' => $post_like,
+        ], 201);
+
+    }
     // Nhận thông báo bài được duyệt
     //Xem thống kê lượt xem
     //chat
