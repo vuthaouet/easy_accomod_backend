@@ -16,6 +16,7 @@ class VerifyCsrfToken extends Middleware
         '/test',
         'auth/*',
         'reset-password',
-        'post/*'
+        'post/*',
+        'admin/*'
     ];
 }

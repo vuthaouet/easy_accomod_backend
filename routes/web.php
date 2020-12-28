@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\SendNotification;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ResetPasswordController;
 use Illuminate\Support\Facades\Route;
@@ -41,6 +42,7 @@ Route::group(['prefix'=>'admin'], function () {
     Route::get('',[AdminController::class, 'getIndex']);
     Route::get('/statistical',[AdminController::class, 'getStatistical']);
     Route::get('/report',[AdminController::class, 'getReport']);
+    Route::post('/notification', [SendNotification::class, 'store'])->name('notification.store');
     Route::group(['prefix'=>'users'],function(){
         //Phê duyệt chủ trọ
         Route::get('/{id}/approval',[AdminController::class, 'approvalUser']);
