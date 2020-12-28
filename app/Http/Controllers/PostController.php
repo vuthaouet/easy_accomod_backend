@@ -32,7 +32,7 @@ class PostController extends Controller
     public function CreatePost(Request $request)
     {
 
-        if (Auth::Check() && Auth::User()->role_id == 2 and Auth::User()->status == 1) {
+        if (Auth::Check() && Auth::User()->role_id == 2 && Auth::User()->status == 1) {
             try {
                 $request->validate([
                     'title' => 'required|unique:posts',
@@ -40,6 +40,7 @@ class PostController extends Controller
                     'price' => 'required',
                     'description' => 'required',
                     'area' => 'required',
+                    'rooms'=>'required',
                 ],
                     [
                         'title.required' => 'Nhập tiêu đề bài đăng',
@@ -47,7 +48,8 @@ class PostController extends Controller
                         'price.required' => 'Nhập giá thuê phòng trọ',
                         'description.required' => 'Nhập mô tả ngắn cho phòng trọ',
                         'address.required' => 'Nhập  địa chỉ phòng trọ ',
-                        'area.required' => 'Nhập diện tích phòng trọ'
+                        'area.required' => 'Nhập diện tích phòng trọ',
+                        'rooms.required' => 'Nhập số lượng phòng trọ'
                     ]);
                 //Tạo địa chỉ mới
                 $address = new Address;
@@ -56,9 +58,9 @@ class PostController extends Controller
                 $type_id = TypeBoarding::where('name', $request->type)->first()->id;
                 /* Check file và lưu file hình ảnh */
                 $json_img = "";
-                if ($request->hasFile('hinhanh')) {
+                if ($request->hasFile('images')) {
                     $arr_images = array();
-                    $inputfile = $request->file('hinhanh');
+                    $inputfile = $request->file('images');
                     foreach ($inputfile as $filehinh) {
                         $namefile = "phongtro-" . str_random(5) . "-" . $filehinh->getClientOriginalName();
                         while (file_exists('uploads/images' . $namefile)) {
@@ -108,11 +110,12 @@ class PostController extends Controller
                 $post->boarding_id = $boarding->id;
                 $post->number_date = $request->number_date;
                 $post->slug = Str::slug($post->title, '-');
+                $post->rooms= $request->rooms;
                 $post->save();
                 //tạo hóa đơn
                 $payment = new Payment;
                 $payment->post_id = $post->id;
-                $payment->money = env('POST_PRICE') * $post->number_date;
+                $payment->money = $request->money;
                 $payment->save();
 
                 return response()->json([
@@ -125,7 +128,8 @@ class PostController extends Controller
             }
         } else {
             return response()->json([
-                'message' => 'Bạn chưa đăng nhập hoặc không có quyền đăng bài!'
+                'message' => 'Bạn chưa đăng nhập hoặc không có quyền đăng bài!',
+                'user' => Auth::User()
             ], 401);
         }
     }
@@ -133,6 +137,23 @@ class PostController extends Controller
     //Chỉnh sửa bài viết mới
     public function UploadPost(Request $request, $id)
     {
+        $request->validate([
+            'title' => 'required|unique:posts',
+            'address' => 'required',
+            'price' => 'required',
+            'description' => 'required',
+            'area' => 'required',
+            'rooms'=>'required',
+        ],
+            [
+                'title.required' => 'Nhập tiêu đề bài đăng',
+                'title.unique'  => 'Tiêu đề đã tồn tại',
+                'price.required' => 'Nhập giá thuê phòng trọ',
+                'description.required' => 'Nhập mô tả ngắn cho phòng trọ',
+                'address.required' => 'Nhập  địa chỉ phòng trọ ',
+                'area.required' => 'Nhập diện tích phòng trọ',
+                'rooms.required' => 'Nhập số lượng phòng trọ'
+            ]);
         $post = Post::find($id);
         if (Auth::Check()) {
 
@@ -145,9 +166,9 @@ class PostController extends Controller
                 $type_id = TypeBoarding::where('name', $request->type)->first()->id;
                 /* Check file và lưu file hình ảnh */
                 $json_img = "";
-                if ($request->hasFile('hinhanh')) {
+                if ($request->hasFile('images')) {
                     $arr_images = array();
-                    $inputfile = $request->file('hinhanh');
+                    $inputfile = $request->file('images');
                     foreach ($inputfile as $filehinh) {
                         $namefile = "phongtro-" . str_random(5) . "-" . $filehinh->getClientOriginalName();
                         while (file_exists('uploads/images' . $namefile)) {
@@ -204,11 +225,12 @@ class PostController extends Controller
                 $boarding->save();
 //                Chinh sửa bài viết
                 $post->title = $request->title;
+                $post->rooms= $request->rooms;
                 $post->number_date = $request->number_date;
                 $post->save();
                 //cập nhật hóa đơn
                 $payment = $post->payments()->orderBy('id', 'DESC')->first();
-                $payment->money = env('POST_PRICE') * $post->number_date;
+                $payment->money = $request->money;
                 $payment->save();
 
                 return response()->json([
@@ -235,6 +257,11 @@ class PostController extends Controller
     {
         $arr_post = [];
         $post = Post::find($id);
+        if($post == null){
+            return response()->json([
+                'message'=>"Không tìm được bài phù hợp",
+            ]);
+        }
         $arr_furnitures = [];
         $arr_palce_arounds = [];
         $user_post = User::find($post->user_id);
@@ -274,7 +301,12 @@ class PostController extends Controller
             $seen_post->count = $seen_post->count +1;
             $seen_post->save();
         }
-
+        $seen_post_count = DB::table('seen_posts')
+            ->select(DB::raw('SUM(count) as total_seens'))
+            ->where('post_id', $post->id)
+            ->groupBy('post_id')
+            ->get();
+        $arr_post['seen_post'] = $seen_post_count;
         return response()->json([
             $arr_post
         ]);
@@ -283,7 +315,12 @@ class PostController extends Controller
     public function GetPostBySlug($slug)
     {
         $arr_post = [];
-        $post = Post::where('slug',$slug);
+        $post = Post::where('slug',$slug)->first();
+        if($post == null){
+            return response()->json([
+                'message'=>"Không tìm được bài phù hợp",
+            ]);
+        }
         $arr_furnitures = [];
         $arr_palce_arounds = [];
         $user_post = User::find($post->user_id);
@@ -323,6 +360,11 @@ class PostController extends Controller
             $seen_post_count = $seen_post->count = $seen_post->count +1;
             $seen_post->save();
         }
+        $seen_post_count = DB::table('seen_posts')
+            ->select(DB::raw('SUM(count) as total_seens'))
+            ->where('post_id', $post->id)
+            ->groupBy('post_id')
+            ->get();
         $arr_post['seen_post'] = $seen_post_count;
 
         return response()->json([
@@ -567,6 +609,40 @@ class PostController extends Controller
         $report->save();
         return response()->json(['thongbao','Cảm ơn bạn đã báo cáo, đội ngũ chúng tôi sẽ xem xét']);
     }
+    //Lấy post gần đây
+    public function getRecentPosts(){
+        $response=[];
+        $posts = Post::all()->sortByDesc('id');
+        foreach($posts as $post){
+        $arr_post = [];
+        $user_post = User::find($post->user_id);
+        $user_name= $user_post->firstname.' '.$user_post->lastname;
+        $boarding = Boarding::find($post->boarding_id);
+        $type_boardings = TypeBoarding::find($boarding->type_id)->name;
+        $boarding['type_boarding'] = $type_boardings;
+        $arr_post['id'] = $post->id;
+        $arr_post['title'] = $post->title;
+        $arr_post['description'] = $boarding->description;
+        $arr_post['user'] = $user_name;
+        $arr_post['image'] = $boarding->images;
+        $arr_post['price'] = $boarding->price;
+        $arr_post['area'] = $boarding->area;
+        $arr_post['created_at'] = $post->created_at;
+        $arr_post['status_review'] = $post->status_review;
+        $arr_post['time_display'] = $post->time_display;
+            $seen_post_count = DB::table('seen_posts')
+            ->select(DB::raw('SUM(count) as total_seens'))
+            ->where('post_id', $post->id)
+            ->groupBy('post_id')
+            ->get();
+        $arr_post['seen_post'] = $seen_post_count;
+        $response[]= $arr_post;
+        }
+        return response()->json([
+            $response
+        ]);
+    }
+
     // lấy bài viết nhiều like
     // lấy bài viết nhiều view
     //tìm top bài đăng gần đây nhất

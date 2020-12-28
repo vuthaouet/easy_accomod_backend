@@ -56,7 +56,8 @@ Route::group(['prefix'=>'admin'], function () {
         Route::get('unapprove/{id}', [AdminController::class, 'unapprovalPost']);
         Route::delete('delele/{id}', [AdminController::class, 'DelPost']);
         Route::delete('boading/delele/{id}', [AdminController::class, 'DelBoading']);
-        //Lấy thống kê theo ngày
+        //Lấy bài post gần đây
+        Route::get('/recent_posts',[AdminController::class, 'getRecentPosts']);
 
     });
 });
@@ -84,11 +85,13 @@ Route::group(['prefix'=>'post'], function () {
     //Lây một bài viết
     Route::get('/{id}',[PostController::class, 'GetPostById'])->where(['id' => '[0-9]+']);;
     //Lấy một bài viết theo slug
-    Route::get('/{slug}',[PostController::class, 'GetPostById']);
+    Route::get('/list/{slug}',[PostController::class, 'GetPostBySlug']);
     //tạo bài viết mới
     Route::post('/create_post',[PostController::class, 'CreatePost']);
     //Sửa bài viết
     Route::post('/{id}/update_post',[PostController::class, 'UploadPost']);
+    //Lấy bài post gần đây
+    Route::get('/recent_posts',[PostController::class, 'getRecentPosts']);
     //Đổi trạng thái phòng trọ và post
     Route::post('/{id}/upload_boarding',[PostController::class, 'UploadBoarding']);
     //Phê duyệt bài post
