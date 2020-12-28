@@ -17,8 +17,8 @@ class CreateBoardingFurnitures extends Migration
             $table->increments('id');
             $table->integer('furniture_id')->unsigned();
             $table->integer('boarding_id')->unsigned();
-            $table->foreign('furniture_id')->references('id')->on('furnitures');
-            $table->foreign('boarding_id')->references('id')->on('boardings');
+            $table->foreign('furniture_id')->references('id')->on('furnitures')->onDelete('cascade');;
+            $table->foreign('boarding_id')->references('id')->on('boardings')->onDelete('cascade');;
         });
     }
 

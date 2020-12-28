@@ -68,30 +68,6 @@ class UserController extends Controller
         $user = $user->getRole($id);
         return response()->json($user);
     }
-    /**
-     * Hiển thị Phê duyệt chủ nhà trọ
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function approvalUser($id)
-    {
-        if (Auth::Check() && Auth::User()->role_id == 1){
-            $user = User::find($id);
-            $user->status = 1;
-            $user->save();
-            return response()->json([
-                'message' => 'Phê duyệt người dùng thành công!'
-            ], 201);
-
-        }
-        else{
-            return response()->json([
-                'message' => 'Bạn không có quyền phê duyệt!',
-
-            ], 201);
-        }
-    }
 
     /**
      * test
@@ -101,9 +77,9 @@ class UserController extends Controller
      */
     public function test($id)
     {
-        $address = new Address;
-        $address =$address->getAddressByUserId($id);
-        return response()->json($address);
+        $user = User::find($id);
+        $user->delete();
+        return response()->json(['Đã xóa người dùng khỏi danh sách. Những bài đăng của người dùng này cũng bị xóa']);
     }
 
 

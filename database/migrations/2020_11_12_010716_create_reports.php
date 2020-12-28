@@ -18,7 +18,7 @@ class CreateReports extends Migration
             $table->integer('post_id')->unsigned();
             $table->string('content');
             $table->tinyInteger('status')->default(0);
-            $table->foreign('post_id')->references('id')->on('posts');
+            $table->foreign('post_id')->references('id')->on('posts')->onDelete('cascade');;
 
         });
     }

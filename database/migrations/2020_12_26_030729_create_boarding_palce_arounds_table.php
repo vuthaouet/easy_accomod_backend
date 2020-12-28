@@ -17,8 +17,8 @@ class CreateBoardingPalceAroundsTable extends Migration
             $table->increments('id');
             $table->integer('palce_around_id')->unsigned();
             $table->integer('boarding_id')->unsigned();
-            $table->foreign('palce_around_id')->references('id')->on('place_arounds');
-            $table->foreign('boarding_id')->references('id')->on('boardings');
+            $table->foreign('palce_around_id')->references('id')->on('place_arounds')->onDelete('cascade');;
+            $table->foreign('boarding_id')->references('id')->on('boardings')->onDelete('cascade');;
 
         });
     }

@@ -22,8 +22,8 @@ class CreatePostsTable extends Migration
             $table->dateTime('time_display', NULL)->nullable();
             $table->integer('number_date')->unsigned();
             $table->tinyInteger('status_review')->default(0);
-            $table->foreign('user_id')->references('id')->on('users');
-            $table->foreign('boarding_id')->references('id')->on('boardings');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');;
+            $table->foreign('boarding_id')->references('id')->on('boardings')->onDelete('cascade');;
 
         });
     }

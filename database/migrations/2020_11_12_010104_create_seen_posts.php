@@ -17,7 +17,7 @@ class CreateSeenPosts extends Migration
             $table->integer('post_id')->unsigned();
             $table->bigInteger('count');
             $table->dateTime('time_seen');
-            $table->foreign('post_id')->references('id')->on('posts');
+            $table->foreign('post_id')->references('id')->on('posts')->onDelete('cascade');;
         });
     }
 

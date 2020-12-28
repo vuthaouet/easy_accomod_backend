@@ -20,8 +20,8 @@ class CreateComments extends Migration
             $table->tinyInteger('status')->default(0);
             $table->integer('reply_for')->unsigned();
             $table->tinyInteger('rating');
-            $table->foreign('post_id')->references('id')->on('posts');
-            $table->foreign('reply_for')->references('id')->on('users');
+            $table->foreign('post_id')->references('id')->on('posts')->onDelete('cascade');;
+            $table->foreign('reply_for')->references('id')->on('users')->onDelete('cascade');;
 
         });
     }

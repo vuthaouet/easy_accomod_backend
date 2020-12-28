@@ -18,8 +18,8 @@ class CreateNotifications extends Migration
             $table->string('content');
             $table->integer('from_id')->unsigned();
             $table->integer('to_id')->unsigned();
-            $table->foreign('from_id')->references('id')->on('users');
-            $table->foreign('to_id')->references('id')->on('users');
+            $table->foreign('from_id')->references('id')->on('users')->onDelete('cascade');;
+            $table->foreign('to_id')->references('id')->on('users')->onDelete('cascade');;
 
         });
     }

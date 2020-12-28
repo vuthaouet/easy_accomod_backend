@@ -25,8 +25,8 @@ class CreateBoardingsTable extends Migration
             $table->integer('electricity_water');
             $table->bigInteger('electricity_price')->nullable();
             $table->bigInteger('water_price')->nullable();
-            $table->foreign('address_id')->references('id')->on('addresses');
-            $table->foreign('type_id')->references('id')->on('type_boardings');
+            $table->foreign('address_id')->references('id')->on('addresses')->onDelete('cascade');;
+            $table->foreign('type_id')->references('id')->on('type_boardings')->onDelete('cascade');;
 
         });
     }

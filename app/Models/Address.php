@@ -36,4 +36,5 @@ class Address extends Model
         return Address::find($user->address_id);
 
     }
+
 }

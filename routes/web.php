@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\UserController;
@@ -22,22 +23,43 @@ Route::get('/', function () {
 });
 
 //Route::resource('registers', \App\Http\Controllers\RegisterController::class);
-Route::get('/test/{id}',[PostController::class, 'GetPost']);
+Route::get('/test/{id}',[UserController::class, 'test']);
 Route::group(['prefix'=>'user'], function () {
     //Đổi mất khẩu
     Route::post('/change_password',[UserController::class, 'Update']);
     //Lấy thông tin cá nhân
     Route::get('/{id}/check_user',[UserController::class, 'checkUser']);
     Route::get('/{id}',[UserController::class, 'show']);
-    //Phê duyệt chủ trọ
-    Route::get('/{id}/approval_user',[UserController::class, 'approvalUser']);
+
     //Lấy số tiền cần trả của 1 user
     Route::get('/{user_id}/payment_user',[PostController::class, 'paymentUser']);
     //Lấy ra sanh sách yêu thích của một user
     Route::get('/{user_id}/post_like',[PostController::class, 'getPostLike']);
 });
+Route::group(['prefix'=>'admin'], function () {
 
+    Route::get('',[AdminController::class, 'getIndex']);
+    Route::get('/statistical',[AdminController::class, 'getStatistical']);
+    Route::get('/report',[AdminController::class, 'getReport']);
+    Route::group(['prefix'=>'users'],function(){
+        //Phê duyệt chủ trọ
+        Route::get('/{id}/approval',[AdminController::class, 'approvalUser']);
+        //Hủy phê duyệt chủ trọ
+        Route::get('/{id}/unapproval',[AdminController::class, 'unapprovalUser']);
+        Route::get('list',[AdminController::class, 'getListUser']);
+        Route::post('edit/{id}',[AdminController::class, 'postUpdateUser'])->name('admin.user.edit');
+        Route::delete('del/{id}',[AdminController::class, 'DeleteUser']);
+    });
+    Route::group(['prefix'=>'post'],function() {
+        Route::get('list', [AdminController::class, 'getListPost']);
+        Route::get('approve/{id}', [AdminController::class, 'approvalPost']);
+        Route::get('unapprove/{id}', [AdminController::class, 'unapprovalPost']);
+        Route::delete('delele/{id}', [AdminController::class, 'DelPost']);
+        Route::delete('boading/delele/{id}', [AdminController::class, 'DelBoading']);
+        //Lấy thống kê theo ngày
 
+    });
+});
 //xác thực
 Route::group([
     'prefix' => 'auth'
@@ -60,7 +82,9 @@ Route::put('reset_password/{token}', [ResetPasswordController::class, 'reset']);
 
 Route::group(['prefix'=>'post'], function () {
     //Lây một bài viết
-    Route::get('/{id}',[PostController::class, 'GetPost']);
+    Route::get('/{id}',[PostController::class, 'GetPostById'])->where(['id' => '[0-9]+']);;
+    //Lấy một bài viết theo slug
+    Route::get('/{slug}',[PostController::class, 'GetPostById']);
     //tạo bài viết mới
     Route::post('/create_post',[PostController::class, 'CreatePost']);
     //Sửa bài viết
@@ -88,8 +112,10 @@ Route::group(['prefix'=>'post'], function () {
     //Xóa khỏi danh sách yêu thích
     Route::get('/{post_id}/unlike_post',[PostController::class,'UnLikePost']);
     //Lấy ra lượt like của post
-    Route::get('/{user_id}/like_post',[PostController::class, 'getLikePost']);
-    //lấy thống kê
-    Route::get('/{post_id}/thong_ke',[PostController::class,'thongKeDay']);
+    Route::get('/like_post',[PostController::class, 'getLikePost']);
+    //thêm comment
+    Route::post('/{post_id}/add_comment',[PostController::class,'userComment']);
+    //Lấy comment
+    Route::get('/{post_id}/comment',[PostController::class,'getComment']);
 
 });

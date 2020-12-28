@@ -4,11 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Address;
 use App\Models\Boarding;
+use App\Models\Comment;
 use App\Models\Furniture;
 use App\Models\LikePost;
 use App\Models\Payment;
 use App\Models\PlaceAround;
 use App\Models\Post;
+use App\Models\Report;
+use App\Models\SeenPost;
 use App\Models\TypeBoarding;
 use App\Models\User;
 use Cassandra\Exception;
@@ -228,7 +231,7 @@ class PostController extends Controller
     }
 
     //Lấy toàn bộ thông tin bài viết
-    public function GetPost($id)
+    public function GetPostById($id)
     {
         $arr_post = [];
         $post = Post::find($id);
@@ -256,6 +259,71 @@ class PostController extends Controller
         $arr_post['user'] = $user_post;
         $arr_post['boarding'] = $boarding;
         $arr_post['payment'] = $payment;
+        visits($post)->increment();
+        $to_day = Carbon::now('Asia/Ho_Chi_Minh')->format('Y-m-d');
+        $seen_post = DB::table('seen_posts')
+                    ->where('post_id', $post->id)
+                    ->where('time_seen',$to_day);
+        if($seen_post->exists()){
+            $seen_post_count = $seen_post->first()->count;
+            $seen_post->update(['count' =>$seen_post_count+ 1]);
+        }else{
+            $seen_post = New SeenPost;
+            $seen_post->time_seen =$to_day;
+            $seen_post->post_id = $post->id;
+            $seen_post->count = $seen_post->count +1;
+            $seen_post->save();
+        }
+
+        return response()->json([
+            $arr_post
+        ]);
+    }
+    //Lấy nhà trọ theo slug
+    public function GetPostBySlug($slug)
+    {
+        $arr_post = [];
+        $post = Post::where('slug',$slug);
+        $arr_furnitures = [];
+        $arr_palce_arounds = [];
+        $user_post = User::find($post->user_id);
+        $boarding = Boarding::find($post->boarding_id);
+        $address_json = Address::find($boarding->address_id);
+        $type_boardings = TypeBoarding::find($boarding->type_id)->name;
+        $address = $address_json->number . "," . $address_json->street . "," . $address_json->wards . "," . $address_json->district . "," . $address_json->provinces;
+        $payment = $post->payments()->orderBy('id', 'DESC')->first();
+        foreach ($boarding->furnitures as $furniture) {
+            $arr_furnitures[] = $furniture->name;
+        }
+        foreach ($boarding->palce_arounds as $palce_around) {
+            $arr_palce_arounds[] = $palce_around->name;
+        }
+
+
+        $boarding['type_boarding'] = $type_boardings;
+        $boarding['address'] = $address;
+        $boarding['furnitures'] = $arr_furnitures;
+        $boarding['palce_around'] = $arr_palce_arounds;
+        $arr_post['post'] = $post;
+        $arr_post['user'] = $user_post;
+        $arr_post['boarding'] = $boarding;
+        $arr_post['payment'] = $payment;
+        visits($post)->increment();
+        $to_day = Carbon::now('Asia/Ho_Chi_Minh')->format('Y-m-d');
+        $seen_post = DB::table('seen_posts')
+            ->where('post_id', $post->id)
+            ->where('time_seen',$to_day);
+        if($seen_post->exists()){
+            $seen_post_count = $seen_post->first()->count+1;
+            $seen_post->update(['count' =>$seen_post_count]);
+        }else{
+            $seen_post = New SeenPost;
+            $seen_post->time_seen =$to_day;
+            $seen_post->post_id = $post->id;
+            $seen_post_count = $seen_post->count = $seen_post->count +1;
+            $seen_post->save();
+        }
+        $arr_post['seen_post'] = $seen_post_count;
 
         return response()->json([
             $arr_post
@@ -289,53 +357,6 @@ class PostController extends Controller
         }
     }
 
-    /**
-     *  Phê duyệt bài post
-     *
-     * @param int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function approvalPost($id)
-    {
-        if (Auth::Check() && Auth::User()->role_id == 1) {
-            $post = Post::find($id);
-            $post->status_review = 1;
-            $post->time_display = Carbon::now()->addDays($post->number_date);
-            $post->save();
-            $payment = $post->payments()->orderBy('id', 'DESC')->first();
-            $payment->status = 1;
-            $payment->save();
-            return response()->json([
-                'message' => 'Phê duyệt bài viết thành công!'
-            ], 201);
-
-        } else {
-            return response()->json([
-                'message' => 'Bạn không có quyền phê duyệt!',
-
-            ], 401);
-        }
-    }
-
-    /**
-     * Hiển thị danh sách bài viết chưa phê duyệt
-     *
-     * @param int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function getUnapprovedPost()
-    {
-        if (Auth::Check() && Auth::User()->role_id == 1) {
-            return response()->json([
-                Post::where('status_review', 0)->get()
-            ], 201);
-        } else {
-            return response()->json([
-                'message' => 'Bạn không có quyền!',
-
-            ], 401);
-        }
-    }
 
     /**
      * Hiển thị danh sách bài viết đã phê duyệt
@@ -426,7 +447,7 @@ class PostController extends Controller
         }
     }
 
-    //Gia hạn bài đăng
+    //Yêu cầu Gia hạn bài đăng
     public function postExtension($post_id, Request $request)
     {
         $post = Post::find($post_id);
@@ -434,6 +455,7 @@ class PostController extends Controller
 
             if (Auth::User()->role_id == 1 || (Auth::User()->id == $post->user_id && $post->status_review == 0)) {
                 $post->number_date = $request->number_date;
+                $post->status_review = 0;
                 $post->save();
                 //cập nhật hóa đơn
                 $payment = new Payment;
@@ -489,17 +511,7 @@ class PostController extends Controller
         ], 201);
 
     }
-    // Lấy ra lượt like của post
-    public function getLikePost(){
-        $like_post = DB::table('like_posts')
-                        ->select('post_id', DB::raw('count(*) as total_likes'))
-                        ->groupBy('post_id')
-                        ->orderBy('count(*)', 'DESC')
-                        ->get();
-        return response()->json([
-            'message' => $like_post,
-        ], 201);
-    }
+
     // Lấy ra sanh sách yêu thích của một user
     public function getPostLike($user_id)
     {
@@ -514,24 +526,50 @@ class PostController extends Controller
         ], 201);
 
     }
-    // Nhận thông báo bài được duyệt
-    //Xem thống kê lượt xem
-        //Thống kê bài post theo ngày
-    public function thongKeDay($post_id){
-        $post = Post::find(1);
-
-        $sum = visits($post)->count();
-        return response()->json($sum);
+    // Lấy ra lượt like của các post
+    public function getLikePost(){
+        $like_post = DB::table('like_posts')
+            ->select('post_id', DB::raw('count(*) as total_likes'))
+            ->groupBy('post_id')
+            ->orderBy('count(*)', 'DESC')
+            ->get();
+        return response()->json([
+            'message' => $like_post,
+        ], 201);
     }
+    // Nhận thông báo bài được duyệt
     //chat
     //Tìm kiếm phòng trọ
     //Thêm Review/bình luận
+    public function userComment($id,Request $request){
+        $comment = new Comment;
+        $comment->post_id = $id;
+        $comment->content = $request->content_resport;
+        $comment->reply_for = Auth::User()->id;
+        $comment->rating=$request->rating;
+        $comment->save();
+        return response()->json(['thongbao','Cảm ơn bạn đã bình luận, đội ngũ chúng tôi sẽ xem xét']);
+    }
     //Lấy Review/bình luận
+    public function getComment($id){
+        $comments = Comment::all()->count();
+        $post = Post::all();
+        return response()->json([
+            'posts'=>$post,
+            'reports' => $comments
+        ]);
+    }
     // Report bài không hợp lệ
+    public function userReport($id,Request $request){
+        $report = new Report;
+        $report->post_id = $id;
+        $report->content = $request->content_resport;
+        $report->save();
+        return response()->json(['thongbao','Cảm ơn bạn đã báo cáo, đội ngũ chúng tôi sẽ xem xét']);
+    }
     // lấy bài viết nhiều like
     // lấy bài viết nhiều view
     //tìm top bài đăng gần đây nhất
-    //Xóa bài post
 
 
 }

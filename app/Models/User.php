@@ -71,7 +71,6 @@ class User extends Authenticatable
         $this->email=$request->email;
         $this->phone_number=$request->phone_number;
         $this->address_id=$address_id;
-
         $this->password=bcrypt($request->password);
         $this->cmnd=$request->cmnd;
         if($request->role == "owner")

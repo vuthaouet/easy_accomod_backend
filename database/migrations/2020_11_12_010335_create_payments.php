@@ -17,7 +17,7 @@ class CreatePayments extends Migration
             $table->increments('id');
             $table->integer('post_id')->unsigned();
             $table->bigInteger('money')->nullable();
-            $table->foreign('post_id')->references('id')->on('posts');
+            $table->foreign('post_id')->references('id')->on('posts')->onDelete('cascade');;
         });
     }
 

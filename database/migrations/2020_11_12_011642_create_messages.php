@@ -19,8 +19,8 @@ class CreateMessages extends Migration
             $table->string('content');
             $table->integer('user_create')->unsigned();
             $table->integer('user_recv')->unsigned();
-            $table->foreign('user_create')->references('id')->on('users');
-            $table->foreign('user_recv')->references('id')->on('users');
+            $table->foreign('user_create')->references('id')->on('users')->onDelete('cascade');;
+            $table->foreign('user_recv')->references('id')->on('users')->onDelete('cascade');;
         });
     }
 

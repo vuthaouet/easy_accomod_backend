@@ -27,8 +27,8 @@ class CreateUsersTable extends Migration
             $table->timestamps();
             $table->tinyInteger('status')->nullable();
             $table->integer('role_id')->unsigned();
-            $table->foreign('address_id')->references('id')->on('addresses');
-            $table->foreign('role_id')->references('id')->on('roles');
+            $table->foreign('address_id')->references('id')->on('addresses')->onDelete('cascade');;
+            $table->foreign('role_id')->references('id')->on('roles')->onDelete('cascade');;
         });
     }
 
