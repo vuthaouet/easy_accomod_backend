@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Address;
+use App\Models\Role;
 use App\Models\User;
 use Cassandra\Exception;
 use Illuminate\Http\Request;
@@ -72,19 +73,27 @@ class AuthController extends Controller
             return response()->json([
                 'message' => 'Đăng nhập không thành công'
             ], 401);
-        $user = $request->user();
-        $tokenResult = $user->createToken('Personal Access Token');
-        $token = $tokenResult->token;
-        if ($request->remember_me)
-            $token->expires_at = Carbon::now()->addWeeks(1);
-        $token->save();
+         $user = $request->user();
+         $tokenResult = $user->createToken('Personal Access Token');
+         $token = $tokenResult->token;
+         if ($request->remember_me)
+             $token->expires_at = Carbon::now()->addWeeks(1);
+         $token->save();
+         $firstName = $user->firstname;
+         $lastName = $user->lastname;
+         $id = $user->id;
+         $role = Role::find($user->role_id)->role_name;
         return response()->json([
             'message' => 'Đăng nhập thành công',
-            'access_token' => $tokenResult->accessToken,
-            'token_type' => 'Bearer',
-            'expires_at' => Carbon::parse(
-                $tokenResult->token->expires_at
-            )->toDateTimeString(),
+             'access_token' => $tokenResult->accessToken,
+             'token_type' => 'Bearer',
+             'expires_at' => Carbon::parse(
+                 $tokenResult->token->expires_at
+             )->toDateTimeString(),
+            'firstName' => $firstName,
+            'lastName' => $lastName,
+            'id' => $id,
+            'role' => $role
         ],201);
     }
 
@@ -96,6 +105,7 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         $request->user()->token()->revoke();
+
         return response()->json([
             'message' => 'Successfully logged out'
         ]);

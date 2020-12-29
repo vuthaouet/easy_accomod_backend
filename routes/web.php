@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\SendNotification;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ResetPasswordController;
 use Illuminate\Support\Facades\Route;
@@ -41,6 +42,7 @@ Route::group(['prefix'=>'admin'], function () {
     Route::get('',[AdminController::class, 'getIndex']);
     Route::get('/statistical',[AdminController::class, 'getStatistical']);
     Route::get('/report',[AdminController::class, 'getReport']);
+    Route::post('/notification', [SendNotification::class, 'store'])->name('notification.store');
     Route::group(['prefix'=>'users'],function(){
         //Phê duyệt chủ trọ
         Route::get('/{id}/approval',[AdminController::class, 'approvalUser']);
@@ -56,7 +58,8 @@ Route::group(['prefix'=>'admin'], function () {
         Route::get('unapprove/{id}', [AdminController::class, 'unapprovalPost']);
         Route::delete('delele/{id}', [AdminController::class, 'DelPost']);
         Route::delete('boading/delele/{id}', [AdminController::class, 'DelBoading']);
-        //Lấy thống kê theo ngày
+        //Lấy bài post gần đây
+        Route::post('/recent_posts',[AdminController::class, 'getRecentPosts']);
 
     });
 });
@@ -84,11 +87,13 @@ Route::group(['prefix'=>'post'], function () {
     //Lây một bài viết
     Route::get('/{id}',[PostController::class, 'GetPostById'])->where(['id' => '[0-9]+']);;
     //Lấy một bài viết theo slug
-    Route::get('/{slug}',[PostController::class, 'GetPostById']);
+    Route::get('/list/{slug}',[PostController::class, 'GetPostBySlug']);
     //tạo bài viết mới
     Route::post('/create_post',[PostController::class, 'CreatePost']);
     //Sửa bài viết
     Route::post('/{id}/update_post',[PostController::class, 'UploadPost']);
+    //Lấy bài post gần đây
+    Route::get('/recent_posts',[PostController::class, 'getRecentPosts']);
     //Đổi trạng thái phòng trọ và post
     Route::post('/{id}/upload_boarding',[PostController::class, 'UploadBoarding']);
     //Phê duyệt bài post
@@ -117,5 +122,7 @@ Route::group(['prefix'=>'post'], function () {
     Route::post('/{post_id}/add_comment',[PostController::class,'userComment']);
     //Lấy comment
     Route::get('/{post_id}/comment',[PostController::class,'getComment']);
+    // tìm kiếm cơ bản
+    Route::post('/search/basic_search',[PostController::class,'basicSearch']);
 
 });

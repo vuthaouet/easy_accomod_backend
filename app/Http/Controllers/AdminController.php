@@ -8,10 +8,12 @@ use App\Models\LikePost;
 use App\Models\Post;
 use App\Models\Report;
 use App\Models\SeenPost;
+use App\Models\TypeBoarding;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use DB;
 
 class AdminController extends Controller
 {
@@ -253,6 +255,37 @@ class AdminController extends Controller
 
         $sum = visits($post)->count();
         return response()->json($sum);
+    }
+    //Lấy post gần đây
+    public function getRecentPosts(){
+        $response=[];
+        $posts = Post::all()->sortByDesc('id');
+        foreach($posts as $post){
+            $arr_post = [];
+            $user_post = User::find($post->user_id);
+            $user_name= $user_post->firstname.' '.$user_post->lastname;
+            $boarding = Boarding::find($post->boarding_id);
+            $type_boardings = TypeBoarding::find($boarding->type_id)->name;
+            $boarding['type_boarding'] = $type_boardings;
+            $arr_post['id'] = $post->id;
+            $arr_post['title'] = $post->title;
+            $arr_post['description'] = $boarding->description;
+            $arr_post['user'] = $user_name;
+            $arr_post['image'] = $boarding->images;
+            $arr_post['price'] = $boarding->price;
+            $arr_post['area'] = $boarding->area;
+            $arr_post['status_review'] = $post->status_review;
+            $seen_post_count = DB::table('seen_posts')
+                ->select(DB::raw('SUM(count) as total_seens'))
+                ->where('post_id', $post->id)
+                ->groupBy('post_id')
+                ->get();
+            $arr_post['seen_post'] = $seen_post_count;
+            $response[]= $arr_post;
+        }
+        return response()->json([
+            $response
+        ]);
     }
 
 }
