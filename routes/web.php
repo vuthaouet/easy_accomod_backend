@@ -31,7 +31,8 @@ Route::group(['prefix'=>'user'], function () {
     //Lấy thông tin cá nhân
     Route::get('/{id}/check_user',[UserController::class, 'checkUser']);
     Route::get('/{id}',[UserController::class, 'show']);
-
+    //Lấy bằng token
+    Route::get('/',[UserController::class, 'getByToken']);
     //Lấy số tiền cần trả của 1 user
     Route::get('/{user_id}/payment_user',[PostController::class, 'paymentUser']);
     //Lấy ra sanh sách yêu thích của một user
