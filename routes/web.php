@@ -122,5 +122,7 @@ Route::group(['prefix'=>'post'], function () {
     Route::post('/{post_id}/add_comment',[PostController::class,'userComment']);
     //Lấy comment
     Route::get('/{post_id}/comment',[PostController::class,'getComment']);
+    // tìm kiếm cơ bản
+    Route::get('/search/basic_search',[PostController::class,'basicSearch']);
 
 });

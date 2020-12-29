@@ -642,6 +642,21 @@ class PostController extends Controller
             $response
         ]);
     }
+    //tìm kiếm cơ bản
+    public function basicSearch(Request $request){
+        if(!$request->provinces){
+            $address = DB::table('addresses')->where('provinces',$request->provinces);
+            return response()->json([
+                $address->get()
+            ]);
+        }
+        return response()->json([
+            "không"
+        ]);
+
+        $address = DB::table('addresses')->where('provinces',$request->provinces)->where('district',$request->provinces)->where('wards',$request->provinces)->get();
+        $boarding = DB::table('boardings')->whereBetween('price', [$request->price_min, $request->price_max])->whereBetween('area', [$request->area_min, $request->area_min]);;
+    }
 
     // lấy bài viết nhiều like
     // lấy bài viết nhiều view
