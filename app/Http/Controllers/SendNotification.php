@@ -9,9 +9,9 @@ use Pusher\Pusher;
 
 class SendNotification extends Controller
 {
-    public function store(Request $request)
+    public function store(Request $request,$user_id)
     {
-        $user = User::find(4); // id của user mình đã đăng kí ở trên, user này sẻ nhận được thông báo
+        $user = User::find($user_id); // id của user mình đã đăng kí ở trên, user này sẻ nhận được thông báo
         $data = $request->only([
             'title',
             'content',
