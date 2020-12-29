@@ -288,10 +288,10 @@ class PostController extends Controller
         foreach ($boarding->palce_arounds as $palce_around) {
             $arr_palce_arounds[] = $palce_around->name;
         }
-        $arr_post['type_boarding'] = $type_boardings;
-        $arr_post['address_boarding'] = $address;
-        $arr_post['furnitures'] = $arr_furnitures;
-        $arr_post['places_around'] = $arr_palce_arounds;
+        $boarding['type_boarding'] = $type_boardings;
+        $boarding['address'] = $address;
+        $boarding['furnitures'] = $arr_furnitures;
+        $boarding['places_around'] = $arr_palce_arounds;
         $arr_post['post'] = $post;
         $arr_post['user'] = $user_post;
         $arr_post['boarding'] = $boarding;
