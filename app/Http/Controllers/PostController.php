@@ -403,7 +403,7 @@ class PostController extends Controller
     {
         $post = Post::find($id);
         $boarding = Boarding::find($post->boarding_id);
-        if (auth('api')->Check() && (auth('api')->user()->id == $post->user_id || auth('api')->user()->role_id == 1)) {
+        if (auth('api')->check() && (auth('api')->user()->id == $post->user_id || auth('api')->user()->role_id == 1)) {
             if ($request->status == 'Chưa được thuê') {
                 $boarding->status = 0;
                 $post->status_review = 1;
