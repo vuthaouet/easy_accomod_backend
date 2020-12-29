@@ -20,6 +20,8 @@ use Illuminate\Support\Facades\Auth;
 use DB;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
+use mysql_xdevapi\Collection;
+use stdClass;
 
 class PostController extends Controller
 {
@@ -673,26 +675,32 @@ class PostController extends Controller
             $addresses = $addresses->get();
         }
 
+
         if ($addresses) {
+            $boardings = '';
             foreach ($addresses as $address) {
-                $boardings = DB::table('boardings')->where('address_id', $address->id);
-                if(!$boardings->get()){
+                $boardings_t = DB::table('boardings')->where('address_id', $address->id);
+                if(!$boardings_t->get()){
                     continue;
                 }
                 if ($request->type) {
                     $type_id = TypeBoarding::where('name', $request->type)->first()->id;
-                    $boardings = $boardings->where('type_id', $type_id);
+                    $boardings_t = $boardings_t->where('type_id', $type_id);
                 }
 
                 if ($request->price_min) {
-                    $boardings = $boardings->whereBetween('price', [$request->price_min, $request->price_max]);
+                    $boardings_t = $boardings_t->whereBetween('price', [$request->price_min, $request->price_max]);
                 }
                 if ($request->area_min) {
-                    $boardings = $boardings->whereBetween('area', [$request->area_min, $request->area_max]);
+                    $boardings_t = $boardings_t->whereBetween('area', [$request->area_min, $request->area_max]);
+                }
+                if($boardings != ''){
+                    $boardings=  $boardings->merge($boardings_t->get());
+                }
+                else{
+                    $boardings = $boardings_t->get();
                 }
             }
-
-
         } else {
             $boardings = DB::table('boardings');
             if ($request->type) {
@@ -705,11 +713,13 @@ class PostController extends Controller
             if ($request->area_min) {
                 $boardings = $boardings->whereBetween('area', [$request->area_min, $request->area_min]);
             }
+            $boardings = $boardings->get();
         }
-        $boardings = $boardings->get();
+
 
         foreach ($boardings as $boarding) {
             $post = DB::table('posts')->where('boarding_id', $boarding->id)->first();
+
             $arr_post = [];
             $user_post = User::find($post->user_id);
             $user_name = $user_post->firstname . ' ' . $user_post->lastname;
