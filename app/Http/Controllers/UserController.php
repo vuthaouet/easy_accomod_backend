@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Address;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -73,6 +74,26 @@ class UserController extends Controller
         $user = $user->getRole($id);
         return response()->json($user);
     }
+    //Lấy thông tin bằng token
+    public function getByToken(){
+        if (auth('api')->check()) {
+            $user = auth('api')->user();
+            $role = Role::find($user->role_id)->role_name;
+            $address_json=Address::find($user->address_id);
+            $address = $address_json->number . "," . $address_json->street . "," . $address_json->wards . "," . $address_json->district . "," . $address_json->provinces;
+            return response()->json([
+                'user:' => $user,
+                'role:' => $role,
+                'address:' => $address,
+            ]);
+        }
+        else {
+            return response()->json([
+                "Bạn chưa đăng nhập"
+            ]);
+        }
+
+    }
 
     /**
      * test
@@ -108,7 +129,7 @@ class UserController extends Controller
      */
     public function Update(Request $request)
     {
-        if(Auth::Check())
+        if(auth('api')->check()())
         {
             $request_data = $request->All();
             $request->validate([
@@ -120,10 +141,10 @@ class UserController extends Controller
                 'new-password.required' => 'Vui lòng nhập mật khẩu',
                 'retype-password' =>'Vui lòng nhập lại mật khẩu'
             ]);
-                $current_password = Auth::User()->password;
+                $current_password = auth('api')->user()->password;
                 if(Hash::check($request_data['old-password'], $current_password))
                 {
-                    $user_id = Auth::User()->id;
+                    $user_id = auth('api')->user()->id;
                     $obj_user = User::find($user_id);
                     $obj_user->password = Hash::make($request_data['new-password']);
                     $obj_user->save();
