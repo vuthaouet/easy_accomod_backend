@@ -612,7 +612,7 @@ class PostController extends Controller
     //Lấy post gần đây
     public function getRecentPosts(){
         $response=[];
-        $posts = Post::all()->sortByDesc('id');
+        $posts = Post::all()->sortByDesc('id')->limit(6);
         foreach($posts as $post){
         $arr_post = [];
         $user_post = User::find($post->user_id);
@@ -644,11 +644,19 @@ class PostController extends Controller
     }
     //tìm kiếm cơ bản
     public function basicSearch(Request $request){
-        if(!$request->provinces){
+
+        if($request->provinces){
             $address = DB::table('addresses')->where('provinces',$request->provinces);
-            return response()->json([
-                $address->get()
-            ]);
+            if($request->wards){
+                $address=$address->where('wards',$request->wards);
+                if($request->wards){
+                    $address=$address->where('wards',$request->wards);
+                    return response()->json([
+                        $address->get()
+                    ]);
+                }
+            }
+
         }
         return response()->json([
             "không"
