@@ -299,9 +299,9 @@ class PostController extends Controller
         $arr_post['address_user'] = $address_user;
         $arr_post['post_created_at'] = $post->created_at->format('Y-m-d');
 
-        if ($post->time_display) {
-            $arr_post['post_time_display'] = $post->time_display->format('Y-m-d');
-        }
+        // if ($post->time_display) {
+        //     $arr_post['post_time_display'] = $post->time_display->format('Y-m-d');
+        // }
         visits($post)->increment();
         $to_day = Carbon::now('Asia/Ho_Chi_Minh')->format('Y-m-d');
         $seen_post = DB::table('seen_posts')
