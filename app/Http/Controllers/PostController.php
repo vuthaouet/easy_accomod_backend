@@ -40,11 +40,11 @@ class PostController extends Controller
                     'price' => 'required',
                     'description' => 'required',
                     'area' => 'required',
-                    'rooms'=>'required',
+                    'rooms' => 'required',
                 ],
                     [
                         'title.required' => 'Nhập tiêu đề bài đăng',
-                        'title.unique'  => 'Tiêu đề đã tồn tại',
+                        'title.unique' => 'Tiêu đề đã tồn tại',
                         'price.required' => 'Nhập giá thuê phòng trọ',
                         'description.required' => 'Nhập mô tả ngắn cho phòng trọ',
                         'address.required' => 'Nhập  địa chỉ phòng trọ ',
@@ -110,7 +110,7 @@ class PostController extends Controller
                 $post->boarding_id = $boarding->id;
                 $post->number_date = $request->number_date;
                 $post->slug = Str::slug($post->title, '-');
-                $post->rooms= $request->rooms;
+                $post->rooms = $request->rooms;
                 $post->save();
                 //tạo hóa đơn
                 $payment = new Payment;
@@ -143,11 +143,11 @@ class PostController extends Controller
             'price' => 'required',
             'description' => 'required',
             'area' => 'required',
-            'rooms'=>'required',
+            'rooms' => 'required',
         ],
             [
                 'title.required' => 'Nhập tiêu đề bài đăng',
-                'title.unique'  => 'Tiêu đề đã tồn tại',
+                'title.unique' => 'Tiêu đề đã tồn tại',
                 'price.required' => 'Nhập giá thuê phòng trọ',
                 'description.required' => 'Nhập mô tả ngắn cho phòng trọ',
                 'address.required' => 'Nhập  địa chỉ phòng trọ ',
@@ -225,7 +225,7 @@ class PostController extends Controller
                 $boarding->save();
 //                Chinh sửa bài viết
                 $post->title = $request->title;
-                $post->rooms= $request->rooms;
+                $post->rooms = $request->rooms;
                 $post->number_date = $request->number_date;
                 $post->save();
                 //cập nhật hóa đơn
@@ -257,9 +257,9 @@ class PostController extends Controller
     {
         $arr_post = [];
         $post = Post::find($id);
-        if($post == null){
+        if ($post == null) {
             return response()->json([
-                'message'=>"Không tìm được bài phù hợp",
+                'message' => "Không tìm được bài phù hợp",
             ]);
         }
         $arr_furnitures = [];
@@ -289,16 +289,16 @@ class PostController extends Controller
         visits($post)->increment();
         $to_day = Carbon::now('Asia/Ho_Chi_Minh')->format('Y-m-d');
         $seen_post = DB::table('seen_posts')
-                    ->where('post_id', $post->id)
-                    ->where('time_seen',$to_day);
-        if($seen_post->exists()){
+            ->where('post_id', $post->id)
+            ->where('time_seen', $to_day);
+        if ($seen_post->exists()) {
             $seen_post_count = $seen_post->first()->count;
-            $seen_post->update(['count' =>$seen_post_count+ 1]);
-        }else{
-            $seen_post = New SeenPost;
-            $seen_post->time_seen =$to_day;
+            $seen_post->update(['count' => $seen_post_count + 1]);
+        } else {
+            $seen_post = new SeenPost;
+            $seen_post->time_seen = $to_day;
             $seen_post->post_id = $post->id;
-            $seen_post->count = $seen_post->count +1;
+            $seen_post->count = $seen_post->count + 1;
             $seen_post->save();
         }
         $seen_post_count = DB::table('seen_posts')
@@ -311,14 +311,15 @@ class PostController extends Controller
             $arr_post
         ]);
     }
+
     //Lấy nhà trọ theo slug
     public function GetPostBySlug($slug)
     {
         $arr_post = [];
-        $post = Post::where('slug',$slug)->first();
-        if($post == null){
+        $post = Post::where('slug', $slug)->first();
+        if ($post == null) {
             return response()->json([
-                'message'=>"Không tìm được bài phù hợp",
+                'message' => "Không tìm được bài phù hợp",
             ]);
         }
         $arr_furnitures = [];
@@ -349,15 +350,15 @@ class PostController extends Controller
         $to_day = Carbon::now('Asia/Ho_Chi_Minh')->format('Y-m-d');
         $seen_post = DB::table('seen_posts')
             ->where('post_id', $post->id)
-            ->where('time_seen',$to_day);
-        if($seen_post->exists()){
-            $seen_post_count = $seen_post->first()->count+1;
-            $seen_post->update(['count' =>$seen_post_count]);
-        }else{
-            $seen_post = New SeenPost;
-            $seen_post->time_seen =$to_day;
+            ->where('time_seen', $to_day);
+        if ($seen_post->exists()) {
+            $seen_post_count = $seen_post->first()->count + 1;
+            $seen_post->update(['count' => $seen_post_count]);
+        } else {
+            $seen_post = new SeenPost;
+            $seen_post->time_seen = $to_day;
             $seen_post->post_id = $post->id;
-            $seen_post_count = $seen_post->count = $seen_post->count +1;
+            $seen_post_count = $seen_post->count = $seen_post->count + 1;
             $seen_post->save();
         }
         $seen_post_count = DB::table('seen_posts')
@@ -517,18 +518,21 @@ class PostController extends Controller
     }
 
     //lấy số tiền phải thanh toán của một chủ nhà trọ
-    public function paymentUser($user_id){
+    public function paymentUser($user_id)
+    {
         $posts = DB::table('posts')->where('user_id', $user_id)->where('status_review', 0)->get();
-        $sum =0;
-        foreach($posts as $post){
+        $sum = 0;
+        foreach ($posts as $post) {
             $sum = $sum + $post->payments()->orderBy('id', 'DESC')->first()->money;
         }
         return response()->json([
             $sum
         ], 201);
     }
+
     //Lưu vào danh sach yêu thích
-    public function postLikePost($post_id){
+    public function postLikePost($post_id)
+    {
         $like_post = new LikePost;
         $like_post->post_id = $post_id;
         $like_post->user_id = Auth::User()->id;
@@ -539,10 +543,12 @@ class PostController extends Controller
         ], 201);
 
     }
+
     //Xóa vào danh sach yêu thích
-    public function UnLikePost($user_id,$post_id){
-        $like_post = DB::table('like_posts')->where('post_id',$post_id)->where('user_id',$user_id)->get();
-        if (! $like_post) {
+    public function UnLikePost($user_id, $post_id)
+    {
+        $like_post = DB::table('like_posts')->where('post_id', $post_id)->where('user_id', $user_id)->get();
+        if (!$like_post) {
             return response()
                 ->json(['error' => 'Error: Không tìm đc lượt thích']);
         }
@@ -557,10 +563,9 @@ class PostController extends Controller
     // Lấy ra sanh sách yêu thích của một user
     public function getPostLike($user_id)
     {
-        $like_post_id = DB::table('like_posts')->select('post_id')->where('user_id',$user_id)->get();
+        $like_post_id = DB::table('like_posts')->select('post_id')->where('user_id', $user_id)->get();
         $post_like = [];
-        foreach($like_post_id as $id)
-        {
+        foreach ($like_post_id as $id) {
             $post_like[] = Post::find($id);
         }
         return response()->json([
@@ -568,8 +573,10 @@ class PostController extends Controller
         ], 201);
 
     }
+
     // Lấy ra lượt like của các post
-    public function getLikePost(){
+    public function getLikePost()
+    {
         $like_post = DB::table('like_posts')
             ->select('post_id', DB::raw('count(*) as total_likes'))
             ->groupBy('post_id')
@@ -583,94 +590,144 @@ class PostController extends Controller
     //chat
     //Tìm kiếm phòng trọ
     //Thêm Review/bình luận
-    public function userComment($id,Request $request){
+    public function userComment($id, Request $request)
+    {
         $comment = new Comment;
         $comment->post_id = $id;
         $comment->content = $request->content_resport;
         $comment->reply_for = Auth::User()->id;
-        $comment->rating=$request->rating;
+        $comment->rating = $request->rating;
         $comment->save();
-        return response()->json(['thongbao','Cảm ơn bạn đã bình luận, đội ngũ chúng tôi sẽ xem xét']);
+        return response()->json(['thongbao', 'Cảm ơn bạn đã bình luận, đội ngũ chúng tôi sẽ xem xét']);
     }
+
     //Lấy Review/bình luận
-    public function getComment($id){
+    public function getComment($id)
+    {
         $comments = Comment::all()->count();
         $post = Post::all();
         return response()->json([
-            'posts'=>$post,
+            'posts' => $post,
             'reports' => $comments
         ]);
     }
+
     // Report bài không hợp lệ
-    public function userReport($id,Request $request){
+    public function userReport($id, Request $request)
+    {
         $report = new Report;
         $report->post_id = $id;
         $report->content = $request->content_resport;
         $report->save();
-        return response()->json(['thongbao','Cảm ơn bạn đã báo cáo, đội ngũ chúng tôi sẽ xem xét']);
+        return response()->json(['thongbao', 'Cảm ơn bạn đã báo cáo, đội ngũ chúng tôi sẽ xem xét']);
     }
+
     //Lấy post gần đây
-    public function getRecentPosts(){
-        $response=[];
-        $posts = Post::all()->sortByDesc('id')->limit(6);
-        foreach($posts as $post){
-        $arr_post = [];
-        $user_post = User::find($post->user_id);
-        $user_name= $user_post->firstname.' '.$user_post->lastname;
-        $boarding = Boarding::find($post->boarding_id);
-        $type_boardings = TypeBoarding::find($boarding->type_id)->name;
-        $boarding['type_boarding'] = $type_boardings;
-        $arr_post['id'] = $post->id;
-        $arr_post['title'] = $post->title;
-        $arr_post['description'] = $boarding->description;
-        $arr_post['user'] = $user_name;
-        $arr_post['image'] = $boarding->images;
-        $arr_post['price'] = $boarding->price;
-        $arr_post['area'] = $boarding->area;
-        $arr_post['created_at'] = $post->created_at;
-        $arr_post['status_review'] = $post->status_review;
-        $arr_post['time_display'] = $post->time_display;
+    public function getRecentPosts()
+    {
+        $response = [];
+        $posts = Post::all()->sortByDesc('id')->take(6);
+        foreach ($posts as $post) {
+            $arr_post = [];
+            $user_post = User::find($post->user_id);
+            $user_name = $user_post->firstname . ' ' . $user_post->lastname;
+            $boarding = Boarding::find($post->boarding_id);
+            $type_boardings = TypeBoarding::find($boarding->type_id)->name;
+            $boarding['type_boarding'] = $type_boardings;
+            $arr_post['id'] = $post->id;
+            $arr_post['title'] = $post->title;
+            $arr_post['description'] = $boarding->description;
+            $arr_post['user'] = $user_name;
+            $arr_post['image'] = $boarding->images;
+            $arr_post['price'] = $boarding->price;
+            $arr_post['area'] = $boarding->area;
+            $arr_post['created_at'] = $post->created_at;
+            $arr_post['status_review'] = $post->status_review;
+            $arr_post['time_display'] = $post->time_display;
             $seen_post_count = DB::table('seen_posts')
-            ->select(DB::raw('SUM(count) as total_seens'))
-            ->where('post_id', $post->id)
-            ->groupBy('post_id')
-            ->get();
-        $arr_post['seen_post'] = $seen_post_count;
-        $response[]= $arr_post;
+                ->select(DB::raw('SUM(count) as total_seens'))
+                ->where('post_id', $post->id)
+                ->groupBy('post_id')
+                ->get();
+            $arr_post['seen_post'] = $seen_post_count;
+            $response[] = $arr_post;
         }
         return response()->json([
             $response
         ]);
     }
-    //tìm kiếm cơ bản
-    public function basicSearch(Request $request){
 
-        if($request->provinces){
-            $address = DB::table('addresses')->where('provinces',$request->provinces);
-            if($request->wards){
-                $address=$address->where('wards',$request->wards);
-                if($request->wards){
-                    $address=$address->where('wards',$request->wards);
-                    return response()->json([
-                        $address->get()
-                    ]);
+    //tìm kiếm cơ bản
+    public function basicSearch(Request $request)
+    {
+        $addresses = '';
+        if ($request->provinces) {
+            $addresses = DB::table('addresses')->where('provinces', $request->provinces);
+            if ($request->district) {
+                $addresses = $addresses->where('district', $request->district);
+                if ($request->wards) {
+                    $addresses = $addresses->where('wards', $request->wards);
+                }
+            }
+        }
+
+        if ($addresses) {
+            foreach ($addresses as $address) {
+                $address_id = $address->id;
+                $boardings = DB::table('boardings')->where('address_id', $address->id);
+                if ($request->type) {
+                    $type_id = TypeBoarding::where('name', $request->type);
+                    $boardings = $boardings->where('type_id', $type_id);
+                }
+                if ($request->price_min) {
+                    $boardings = $boardings->whereBetween('price', [$request->price_min, $request->price_max]);
+                }
+                if ($request->area_min) {
+                    $boardings = $boardings->whereBetween('area', [$request->area_min, $request->area_min]);
                 }
             }
 
+        }else{
+            $boardings = DB::table('boardings');
+            if ($request->type) {
+                $type_id = TypeBoarding::where('name', $request->type);
+                $boardings = $boardings->where('type_id', $type_id);
+            }
+            if ($request->price_min) {
+                $boardings = $boardings->whereBetween('price', [$request->price_min, $request->price_max]);
+            }
+            if ($request->area_min) {
+                $boardings = $boardings->whereBetween('area', [$request->area_min, $request->area_min]);
+            }
         }
-        return response()->json([
-            "không"
-        ]);
 
-        $address = DB::table('addresses')->where('provinces',$request->provinces)->where('district',$request->provinces)->where('wards',$request->provinces)->get();
-        $boarding = DB::table('boardings')->whereBetween('price', [$request->price_min, $request->price_max])->whereBetween('area', [$request->area_min, $request->area_min]);;
+        foreach ($boardings as $boarding) {
+            $post = DB::table('posts')->where('boarding_id',$boarding->id);
+            $arr_post = [];
+            $user_post = User::find($post->user_id);
+            $user_name = $user_post->firstname . ' ' . $user_post->lastname;
+            $boarding = Boarding::find($post->boarding_id);
+            $type_boardings = TypeBoarding::find($boarding->type_id)->name;
+            $boarding['type_boarding'] = $type_boardings;
+            $arr_post['id'] = $post->id;
+            $arr_post['title'] = $post->title;
+            $arr_post['description'] = $boarding->description;
+            $arr_post['user'] = $user_name;
+            $arr_post['image'] = $boarding->images;
+            $arr_post['price'] = $boarding->price;
+            $arr_post['area'] = $boarding->area;
+            $arr_post['created_at'] = $post->created_at;
+            $arr_post['status_review'] = $post->status_review;
+            $arr_post['time_display'] = $post->time_display;
+        }
+
+
+        // lấy bài viết nhiều like
+        // lấy bài viết nhiều view
+        //tìm top bài đăng gần đây nhất
+
+
     }
-
-    // lấy bài viết nhiều like
-    // lấy bài viết nhiều view
-    //tìm top bài đăng gần đây nhất
-
-
 }
 
 
