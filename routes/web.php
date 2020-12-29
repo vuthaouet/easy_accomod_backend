@@ -59,7 +59,7 @@ Route::group(['prefix'=>'admin'], function () {
         Route::delete('delele/{id}', [AdminController::class, 'DelPost']);
         Route::delete('boading/delele/{id}', [AdminController::class, 'DelBoading']);
         //Lấy bài post gần đây
-        Route::get('/recent_posts',[AdminController::class, 'getRecentPosts']);
+        Route::post('/recent_posts',[AdminController::class, 'getRecentPosts']);
 
     });
 });
@@ -123,6 +123,6 @@ Route::group(['prefix'=>'post'], function () {
     //Lấy comment
     Route::get('/{post_id}/comment',[PostController::class,'getComment']);
     // tìm kiếm cơ bản
-    Route::get('/search/basic_search',[PostController::class,'basicSearch']);
+    Route::post('/search/basic_search',[PostController::class,'basicSearch']);
 
 });
