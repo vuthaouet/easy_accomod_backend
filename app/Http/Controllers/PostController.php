@@ -296,11 +296,11 @@ class PostController extends Controller
         $arr_post['user'] = $user_post;
         $arr_post['boarding'] = $boarding;
         $arr_post['payment'] = $payment;
-        $arr_post['address_user'] =$address_user;
-        $arr_post['post_created_at'] =$post->created_at->format('Y-m-d');
+        $arr_post['address_user'] = $address_user;
+        $arr_post['post_created_at'] = $post->created_at->format('Y-m-d');
 
-        if($post->time_display){
-            $arr_post['post_time_display'] =$post->time_display->format('Y-m-d');
+        if ($post->time_display) {
+            $arr_post['post_time_display'] = $post->time_display->format('Y-m-d');
         }
         visits($post)->increment();
         $to_day = Carbon::now('Asia/Ho_Chi_Minh')->format('Y-m-d');
@@ -330,7 +330,7 @@ class PostController extends Controller
             ->get();
         $arr_post['like_post'] = $like_post_count;
         $arr_post['seen_post'] = $seen_post_count;
-        $arr_post['comment']=$comments;
+        $arr_post['comment'] = $comments;
         return response()->json([
             $arr_post
         ]);
@@ -399,8 +399,7 @@ class PostController extends Controller
 
 
     //Update trạng thái phòng trọ
-    public
-    function UploadBoarding(Request $request, $id)
+    public function UploadBoarding(Request $request, $id)
     {
         $post = Post::find($id);
         $boarding = Boarding::find($post->boarding_id);
@@ -432,8 +431,7 @@ class PostController extends Controller
      * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public
-    function getApprovedPost()
+    public function getApprovedPost()
     {
         return response()->json([
             Post::where('status_review', 1)->get()
@@ -447,8 +445,7 @@ class PostController extends Controller
      * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public
-    function getExpiredPost()
+    public function getExpiredPost()
     {
 
         if (auth('api')->check() && auth('api')->user()->role_id == 1) {
@@ -469,8 +466,7 @@ class PostController extends Controller
      * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public
-    function getUnapprovedPostOfUser($user_id)
+    public function getUnapprovedPostOfUser($user_id)
     {
         if (auth('api')->check() && (auth('api')->user()->role_id == 1 || auth('api')->user()->role_id == 2)) {
             return response()->json([
@@ -490,8 +486,7 @@ class PostController extends Controller
      * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public
-    function getApprovedPostOfUser($user_id)
+    public function getApprovedPostOfUser($user_id)
     {
         return response()->json([
             DB::table('posts')->where('user_id', $user_id)->where('status_review', 1)->get()
@@ -504,8 +499,7 @@ class PostController extends Controller
      * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public
-    function getExpiredPostOfUser($user_id)
+    public function getExpiredPostOfUser($user_id)
     {
 
         if (auth('api')->check() && (auth('api')->user()->role_id == 1 || auth('api')->user()->role_id == 2)) {
@@ -521,8 +515,7 @@ class PostController extends Controller
     }
 
     //Yêu cầu Gia hạn bài đăng
-    public
-    function postExtension($post_id, Request $request)
+    public function postExtension($post_id, Request $request)
     {
         $post = Post::find($post_id);
         if (auth('api')->check()) {
@@ -549,8 +542,7 @@ class PostController extends Controller
     }
 
     //lấy số tiền phải thanh toán của một chủ nhà trọ
-    public
-    function paymentUser($user_id)
+    public function paymentUser($user_id)
     {
         $posts = DB::table('posts')->where('user_id', $user_id)->where('status_review', 0)->get();
         $sum = 0;
@@ -563,8 +555,7 @@ class PostController extends Controller
     }
 
     //Lưu vào danh sach yêu thích
-    public
-    function postLikePost($post_id)
+    public function postLikePost($post_id)
     {
         $like_post = new LikePost;
         $like_post->post_id = $post_id;
@@ -578,10 +569,9 @@ class PostController extends Controller
     }
 
     //Xóa vào danh sach yêu thích
-    public
-    function UnLikePost($user_id, $post_id)
+    public function UnLikePost( $post_id)
     {
-        $like_post = DB::table('like_posts')->where('post_id', $post_id)->where('user_id', $user_id)->get();
+        $like_post = DB::table('like_posts')->where('post_id', $post_id)->where('user_id', auth('api')->user()->id)->get();
         if (!$like_post) {
             return response()
                 ->json(['error' => 'Error: Không tìm đc lượt thích']);
@@ -595,8 +585,7 @@ class PostController extends Controller
     }
 
     // Lấy ra sanh sách yêu thích của một user
-    public
-    function getPostLike($user_id)
+    public function getPostLike($user_id)
     {
         $like_post_id = DB::table('like_posts')->select('post_id')->where('user_id', $user_id)->get();
         $post_like = [];
@@ -610,8 +599,7 @@ class PostController extends Controller
     }
 
     // Lấy ra lượt like của các post
-    public
-    function getLikePost()
+    public function getLikePost()
     {
         $like_post = DB::table('like_posts')
             ->select('post_id', DB::raw('count(*) as total_likes'))
@@ -627,8 +615,7 @@ class PostController extends Controller
     //chat
     //Tìm kiếm phòng trọ
     //Thêm Review/bình luận
-    public
-    function userComment($id, Request $request)
+    public function userComment($id, Request $request)
     {
         $comment = new Comment;
         $comment->post_id = $id;
@@ -640,8 +627,7 @@ class PostController extends Controller
     }
 
     //Lấy Review/bình luận
-    public
-    function getComment($id)
+    public function getComment($id)
     {
         $comments = Comment::all()->count();
         $post = Post::all();
@@ -652,8 +638,7 @@ class PostController extends Controller
     }
 
     // Report bài không hợp lệ
-    public
-    function userReport($id, Request $request)
+    public function userReport($id, Request $request)
     {
         $report = new Report;
         $report->post_id = $id;
@@ -698,8 +683,7 @@ class PostController extends Controller
     }
 
     //tìm kiếm
-    public
-    function basicSearch(Request $request)
+    public function basicSearch(Request $request)
     {
         $response = [];
         $addresses = '';
@@ -720,19 +704,18 @@ class PostController extends Controller
             foreach ($addresses as $address) {
                 if ($request->furniture) {
                     $check = true;
-                    $list_furniture_id=[];
-                    $arr_furniturs_name_request= explode(",", $request->furniture);
+                    $list_furniture_id = [];
+                    $arr_furniturs_name_request = explode(",", $request->furniture);
                     foreach ($arr_furniturs_name_request as $furnitur_name) {
                         $list_furniture_id [] = Furniture::where(['name' => $furnitur_name])->first()->id;
                     }
-                    $boardings_t=DB::table('boardings')
-                        ->join('boarding_furnitures','boarding_furnitures.boarding_id', '=', 'boardings.id')
+                    $boardings_t = DB::table('boardings')
+                        ->join('boarding_furnitures', 'boarding_furnitures.boarding_id', '=', 'boardings.id')
                         ->where();
-                    foreach($list_furniture_id as $id){
-                        $boardings= $boardings->where('boarding_furnitures.furniture_id',$id);
+                    foreach ($list_furniture_id as $id) {
+                        $boardings = $boardings->where('boarding_furnitures.furniture_id', $id);
                     }
-                }
-                else{
+                } else {
                     $boardings_t = DB::table('boardings');
                 }
                 $boardings_t = $boardings_t->where('address_id', $address->id);
@@ -763,15 +746,15 @@ class PostController extends Controller
 
             if ($request->furniture) {
                 $check = true;
-                $list_furniture_id=[];
-                $arr_furniturs_name_request= explode(",", $request->furniture);
+                $list_furniture_id = [];
+                $arr_furniturs_name_request = explode(",", $request->furniture);
                 foreach ($arr_furniturs_name_request as $furnitur_name) {
                     $list_furniture_id [] = Furniture::where(['name' => $furnitur_name])->first()->id;
                 }
-                $boardings=$boardings
-                    ->join('boarding_furnitures','boarding_furnitures.boarding_id', '=', 'boardings.id');
-                foreach($list_furniture_id as $id){
-                    $boardings= $boardings->where('boarding_furnitures.furniture_id',$id);
+                $boardings = $boardings
+                    ->join('boarding_furnitures', 'boarding_furnitures.boarding_id', '=', 'boardings.id');
+                foreach ($list_furniture_id as $id) {
+                    $boardings = $boardings->where('boarding_furnitures.furniture_id', $id);
                 }
             }
             if ($request->type) {
@@ -790,7 +773,7 @@ class PostController extends Controller
             $boardings = $boardings->get();
         }
 
-        if($boardings) {
+        if ($boardings) {
             foreach ($boardings as $boarding) {
                 $post = DB::table('posts')->where('boarding_id', $boarding->id)->first();
                 $arr_post = [];
@@ -813,7 +796,7 @@ class PostController extends Controller
             }
         }
         return response()->json([
-           $response,
+            $response,
 
 
         ]);
