@@ -50,7 +50,7 @@ class AdminController extends Controller
         ]);
     }
     public function isAdmin(){
-        if (Auth::Check() && Auth::User()->role_id == 1){
+        if (auth('api')->check()  && auth('api')->user() ->role_id == 1){
            return response()->json([ "Bạn là admin"]);
         }
         else
@@ -83,7 +83,7 @@ class AdminController extends Controller
      */
     public function approvalPost($id)
     {
-        if (Auth::Check() && Auth::User()->role_id == 1) {
+        if (auth('api')->check()  && auth('api')->user() ->role_id == 1) {
             $post = Post::find($id);
             $post->status_review = 1;
             $post->time_display = Carbon::now()->addDays($post->number_date);
@@ -107,7 +107,7 @@ class AdminController extends Controller
 
     public function unapprovalPost($id)
     {
-        if (Auth::Check() && Auth::User()->role_id == 1) {
+        if (auth('api')->check()  && auth('api')->user() ->role_id == 1) {
             $post = Post::find($id);
             $post->status_review = 0;
             $post->time_display = Carbon::now('Asia/Ho_Chi_Minh')->addDays($post->number_date);
@@ -135,7 +135,7 @@ class AdminController extends Controller
      */
     public function getUnapprovedPost()
     {
-        if (Auth::Check() && Auth::User()->role_id == 1) {
+        if (auth('api')->check()  && auth('api')->user() ->role_id == 1) {
             return response()->json([
                 Post::where('status_review', 0)->get()
             ], 201);
@@ -196,7 +196,7 @@ class AdminController extends Controller
      */
     public function approvalUser($id)
     {
-        if (Auth::Check() && Auth::User()->role_id == 1){
+        if (auth('api')->check()  && auth('api')->user() ->role_id == 1){
             $user = User::find($id);
             $user->status = 1;
             $user->save();
@@ -220,7 +220,7 @@ class AdminController extends Controller
      */
     public function unapprovalUser($id)
     {
-        if (Auth::Check() && Auth::User()->role_id == 1){
+        if (auth('api')->check()  && auth('api')->user() ->role_id == 1){
             $user = User::find($id);
             $user->status = 1;
             $user->save();
