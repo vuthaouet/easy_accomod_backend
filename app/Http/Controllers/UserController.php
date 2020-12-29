@@ -53,7 +53,7 @@ class UserController extends Controller
     {
         $user  = DB::table('users')
             ->where('id', $id)
-            ->get();
+            ->first();
         $address_json=Address::find($user->address_id);
         $address = $address_json->number . "," . $address_json->street . "," . $address_json->wards . "," . $address_json->district . "," . $address_json->provinces;
         return response()->json([
