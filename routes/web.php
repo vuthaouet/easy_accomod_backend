@@ -37,13 +37,16 @@ Route::group(['prefix'=>'user'], function () {
     Route::get('/{user_id}/payment_user',[PostController::class, 'paymentUser']);
     //Lấy ra sanh sách yêu thích của một user
     Route::get('/{user_id}/post_like',[PostController::class, 'getPostLike']);
+    // Lấy ra thông báo
+    Route::get('/notification',[UserController::class, 'getNotification']);
 });
 Route::group(['prefix'=>'admin'], function () {
 
     Route::get('',[AdminController::class, 'getIndex']);
     Route::get('/statistical',[AdminController::class, 'getStatistical']);
     Route::get('/report',[AdminController::class, 'getReport']);
-    Route::post('/notification', [SendNotification::class, 'store'])->name('notification.store');
+    //Gửi thông báo
+    Route::post('/notification/{user_id}', [SendNotification::class, 'store'])->name('notification.store');
     Route::group(['prefix'=>'users'],function(){
         //Phê duyệt chủ trọ
         Route::get('/{id}/approval',[AdminController::class, 'approvalUser']);

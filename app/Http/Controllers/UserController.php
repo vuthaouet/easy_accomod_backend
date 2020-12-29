@@ -174,6 +174,10 @@ class UserController extends Controller
     {
         //
     }
+    //Lấy thông báo
+    public function getNotification(){
+        return response()->json(auth('api')->user()->notifications);
+    }
 
 
 
