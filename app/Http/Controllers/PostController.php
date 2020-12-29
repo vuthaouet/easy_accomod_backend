@@ -641,7 +641,7 @@ class PostController extends Controller
             $arr_post['image'] = $boarding->images;
             $arr_post['price'] = $boarding->price;
             $arr_post['area'] = $boarding->area;
-            $arr_post['created_at'] = $post->created_at;
+            $arr_post['created_at'] = $post->created_at->format('Y-m-d');
             $arr_post['status_review'] = $post->status_review;
             $arr_post['time_display'] = $post->time_display;
             $seen_post_count = DB::table('seen_posts')
@@ -657,7 +657,7 @@ class PostController extends Controller
         ]);
     }
 
-    //tìm kiếm cơ bản
+    //tìm kiếm
     public function basicSearch(Request $request)
     {
         $addresses = '';
@@ -669,11 +669,11 @@ class PostController extends Controller
                     $addresses = $addresses->where('wards', $request->wards);
                 }
             }
+            $addresses=$addresses->get();
         }
 
         if ($addresses) {
             foreach ($addresses as $address) {
-                $address_id = $address->id;
                 $boardings = DB::table('boardings')->where('address_id', $address->id);
                 if ($request->type) {
                     $type_id = TypeBoarding::where('name', $request->type);
@@ -700,6 +700,7 @@ class PostController extends Controller
                 $boardings = $boardings->whereBetween('area', [$request->area_min, $request->area_min]);
             }
         }
+        $boardings=$boardings->get();
 
         foreach ($boardings as $boarding) {
             $post = DB::table('posts')->where('boarding_id',$boarding->id);
