@@ -660,6 +660,7 @@ class PostController extends Controller
     //tìm kiếm
     public function basicSearch(Request $request)
     {
+        $response = [];
         $addresses = '';
         if ($request->provinces) {
             $addresses = DB::table('addresses')->where('provinces', $request->provinces);
@@ -669,25 +670,30 @@ class PostController extends Controller
                     $addresses = $addresses->where('wards', $request->wards);
                 }
             }
-            $addresses=$addresses->get();
+            $addresses = $addresses->get();
         }
 
         if ($addresses) {
             foreach ($addresses as $address) {
                 $boardings = DB::table('boardings')->where('address_id', $address->id);
+                if(!$boardings->get()){
+                    continue;
+                }
                 if ($request->type) {
-                    $type_id = TypeBoarding::where('name', $request->type);
+                    $type_id = TypeBoarding::where('name', $request->type)->first()->id;
                     $boardings = $boardings->where('type_id', $type_id);
                 }
+
                 if ($request->price_min) {
                     $boardings = $boardings->whereBetween('price', [$request->price_min, $request->price_max]);
                 }
                 if ($request->area_min) {
-                    $boardings = $boardings->whereBetween('area', [$request->area_min, $request->area_min]);
+                    $boardings = $boardings->whereBetween('area', [$request->area_min, $request->area_max]);
                 }
             }
 
-        }else{
+
+        } else {
             $boardings = DB::table('boardings');
             if ($request->type) {
                 $type_id = TypeBoarding::where('name', $request->type);
@@ -700,10 +706,10 @@ class PostController extends Controller
                 $boardings = $boardings->whereBetween('area', [$request->area_min, $request->area_min]);
             }
         }
-        $boardings=$boardings->get();
+        $boardings = $boardings->get();
 
         foreach ($boardings as $boarding) {
-            $post = DB::table('posts')->where('boarding_id',$boarding->id);
+            $post = DB::table('posts')->where('boarding_id', $boarding->id)->first();
             $arr_post = [];
             $user_post = User::find($post->user_id);
             $user_name = $user_post->firstname . ' ' . $user_post->lastname;
@@ -720,15 +726,20 @@ class PostController extends Controller
             $arr_post['created_at'] = $post->created_at;
             $arr_post['status_review'] = $post->status_review;
             $arr_post['time_display'] = $post->time_display;
+            $response[] = $arr_post;
         }
-
-
-        // lấy bài viết nhiều like
-        // lấy bài viết nhiều view
-        //tìm top bài đăng gần đây nhất
-
+        return response()->json([
+            $response
+        ]);
 
     }
+
+
+    // lấy bài viết nhiều like
+    // lấy bài viết nhiều view
+    //tìm top bài đăng gần đây nhất
+
+
 }
 
 
