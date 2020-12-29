@@ -702,18 +702,22 @@ class PostController extends Controller
                 }
             }
         } else {
+
             $boardings = DB::table('boardings');
+
             if ($request->type) {
-                $type_id = TypeBoarding::where('name', $request->type);
-                $boardings = $boardings->where('type_id', $type_id);
+                $type_id = TypeBoarding::where('name', $request->type)->first()->id;
+               $boardings = $boardings->where('type_id', $type_id);
             }
+
             if ($request->price_min) {
                 $boardings = $boardings->whereBetween('price', [$request->price_min, $request->price_max]);
             }
+
             if ($request->area_min) {
-                $boardings = $boardings->whereBetween('area', [$request->area_min, $request->area_min]);
+                $boardings = $boardings->whereBetween('area', [$request->area_min, $request->area_max]);
             }
-            $boardings = $boardings->get();
+            return $boardings = $boardings->get();
         }
 
 
