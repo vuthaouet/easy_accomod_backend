@@ -35,7 +35,7 @@ class PostController extends Controller
     {
 
         if (auth('api')->check()) {
-            if ((auth('api')->user()->role_id == 2 && auth('api')->user()->status == 1)|| auth('api')->user()->role_id == 1 ) {
+            if ((auth('api')->user()->role_id == 2 && auth('api')->user()->status == 1) || auth('api')->user()->role_id == 1) {
                 try {
                     $request->validate([
                         'title' => 'required|unique:posts',
@@ -61,7 +61,6 @@ class PostController extends Controller
                     $type_id = TypeBoarding::where('name', $request->type)->first()->id;
                     /* Check file và lưu file hình ảnh */
                     $json_img = "";
-                    return response()->json([$request->hasFile('images')]);
                     if ($request->hasFile('images')) {
                         $arr_images = array();
                         $inputfile = $request->file('images');
@@ -130,8 +129,7 @@ class PostController extends Controller
                         'message' => 'Tạo bài viết mới không thành công!'
                     ], 401);
                 }
-            }
-            else {
+            } else {
                 return response()->json([
                     'message' => 'Bạn không có quyền đăng bài!',
                     'user' => auth('api')->user()
@@ -264,8 +262,7 @@ class PostController extends Controller
     }
 
     //Lấy toàn bộ thông tin bài viết
-    public
-    function GetPostById($id)
+    public function GetPostById($id)
     {
         $arr_post = [];
         $post = Post::find($id);
@@ -274,11 +271,14 @@ class PostController extends Controller
                 'message' => "Không tìm được bài phù hợp",
             ]);
         }
+
         $arr_furnitures = [];
         $arr_palce_arounds = [];
         $user_post = User::find($post->user_id);
         $boarding = Boarding::find($post->boarding_id);
         $address_json = Address::find($boarding->address_id);
+        $address_json_user = Address::find($user_post->address_id);
+        $address_user = $address_json_user->number . "," . $address_json_user->street . "," . $address_json_user->wards . "," . $address_json_user->district . "," . $address_json_user->provinces;
         $type_boardings = TypeBoarding::find($boarding->type_id)->name;
         $address = $address_json->number . "," . $address_json->street . "," . $address_json->wards . "," . $address_json->district . "," . $address_json->provinces;
         $payment = $post->payments()->orderBy('id', 'DESC')->first();
@@ -288,16 +288,20 @@ class PostController extends Controller
         foreach ($boarding->palce_arounds as $palce_around) {
             $arr_palce_arounds[] = $palce_around->name;
         }
-
-
-        $boarding['type_boarding'] = $type_boardings;
-        $boarding['address'] = $address;
-        $boarding['furnitures'] = $arr_furnitures;
-        $boarding['palce_around'] = $arr_palce_arounds;
+        $arr_post['type_boarding'] = $type_boardings;
+        $arr_post['address_boarding'] = $address;
+        $arr_post['furnitures'] = $arr_furnitures;
+        $arr_post['places_around'] = $arr_palce_arounds;
         $arr_post['post'] = $post;
         $arr_post['user'] = $user_post;
         $arr_post['boarding'] = $boarding;
         $arr_post['payment'] = $payment;
+        $arr_post['address_user'] =$address_user;
+        $arr_post['post_created_at'] =$post->created_at->format('Y-m-d');
+
+        if($post->time_display){
+            $arr_post['post_time_display'] =$post->time_display->format('Y-m-d');
+        }
         visits($post)->increment();
         $to_day = Carbon::now('Asia/Ho_Chi_Minh')->format('Y-m-d');
         $seen_post = DB::table('seen_posts')
@@ -314,19 +318,26 @@ class PostController extends Controller
             $seen_post->save();
         }
         $seen_post_count = DB::table('seen_posts')
-            ->select(DB::raw('SUM(count) as total_seens'))
             ->where('post_id', $post->id)
             ->groupBy('post_id')
+            ->count();
+        $like_post_count = DB::table('like_posts')
+            ->where('post_id', $post->id)
+            ->groupBy('post_id')
+            ->count();
+        $comments = DB::table('comments')
+            ->where('post_id', $post->id)
             ->get();
+        $arr_post['like_post'] = $like_post_count;
         $arr_post['seen_post'] = $seen_post_count;
+        $arr_post['comment']=$comments;
         return response()->json([
             $arr_post
         ]);
     }
 
     //Lấy nhà trọ theo slug
-    public
-    function GetPostBySlug($slug)
+    public function GetPostBySlug($slug)
     {
         $arr_post = [];
         $post = Post::where('slug', $slug)->first();
@@ -652,8 +663,7 @@ class PostController extends Controller
     }
 
     //Lấy post gần đây
-    public
-    function getRecentPosts()
+    public function getRecentPosts()
     {
         $response = [];
         $posts = Post::all()->sortByDesc('id')->take(6);
@@ -708,10 +718,28 @@ class PostController extends Controller
         if ($addresses) {
             $boardings = '';
             foreach ($addresses as $address) {
-                $boardings_t = DB::table('boardings')->where('address_id', $address->id);
+                if ($request->furniture) {
+                    $check = true;
+                    $list_furniture_id=[];
+                    $arr_furniturs_name_request= explode(",", $request->furniture);
+                    foreach ($arr_furniturs_name_request as $furnitur_name) {
+                        $list_furniture_id [] = Furniture::where(['name' => $furnitur_name])->first()->id;
+                    }
+                    $boardings_t=DB::table('boardings')
+                        ->join('boarding_furnitures','boarding_furnitures.boarding_id', '=', 'boardings.id')
+                        ->where();
+                    foreach($list_furniture_id as $id){
+                        $boardings= $boardings->where('boarding_furnitures.furniture_id',$id);
+                    }
+                }
+                else{
+                    $boardings_t = DB::table('boardings');
+                }
+                $boardings_t = $boardings_t->where('address_id', $address->id);
                 if (!$boardings_t->get()) {
                     continue;
                 }
+
                 if ($request->type) {
                     $type_id = TypeBoarding::where('name', $request->type)->first()->id;
                     $boardings_t = $boardings_t->where('type_id', $type_id);
@@ -733,6 +761,19 @@ class PostController extends Controller
 
             $boardings = DB::table('boardings');
 
+            if ($request->furniture) {
+                $check = true;
+                $list_furniture_id=[];
+                $arr_furniturs_name_request= explode(",", $request->furniture);
+                foreach ($arr_furniturs_name_request as $furnitur_name) {
+                    $list_furniture_id [] = Furniture::where(['name' => $furnitur_name])->first()->id;
+                }
+                $boardings=$boardings
+                    ->join('boarding_furnitures','boarding_furnitures.boarding_id', '=', 'boardings.id');
+                foreach($list_furniture_id as $id){
+                    $boardings= $boardings->where('boarding_furnitures.furniture_id',$id);
+                }
+            }
             if ($request->type) {
                 $type_id = TypeBoarding::where('name', $request->type)->first()->id;
                 $boardings = $boardings->where('type_id', $type_id);
@@ -745,33 +786,36 @@ class PostController extends Controller
             if ($request->area_min) {
                 $boardings = $boardings->whereBetween('area', [$request->area_min, $request->area_max]);
             }
-            return $boardings = $boardings->get();
+
+            $boardings = $boardings->get();
         }
 
-
-        foreach ($boardings as $boarding) {
-            $post = DB::table('posts')->where('boarding_id', $boarding->id)->first();
-
-            $arr_post = [];
-            $user_post = User::find($post->user_id);
-            $user_name = $user_post->firstname . ' ' . $user_post->lastname;
-            $boarding = Boarding::find($post->boarding_id);
-            $type_boardings = TypeBoarding::find($boarding->type_id)->name;
-            $boarding['type_boarding'] = $type_boardings;
-            $arr_post['id'] = $post->id;
-            $arr_post['title'] = $post->title;
-            $arr_post['description'] = $boarding->description;
-            $arr_post['user'] = $user_name;
-            $arr_post['image'] = $boarding->images;
-            $arr_post['price'] = $boarding->price;
-            $arr_post['area'] = $boarding->area;
-            $arr_post['created_at'] = $post->created_at;
-            $arr_post['status_review'] = $post->status_review;
-            $arr_post['time_display'] = $post->time_display;
-            $response[] = $arr_post;
+        if($boardings) {
+            foreach ($boardings as $boarding) {
+                $post = DB::table('posts')->where('boarding_id', $boarding->id)->first();
+                $arr_post = [];
+                $user_post = User::find($post->user_id);
+                $user_name = $user_post->firstname . ' ' . $user_post->lastname;
+                $boarding = Boarding::find($post->boarding_id);
+                $type_boardings = TypeBoarding::find($boarding->type_id)->name;
+                $boarding['type_boarding'] = $type_boardings;
+                $arr_post['id'] = $post->id;
+                $arr_post['title'] = $post->title;
+                $arr_post['description'] = $boarding->description;
+                $arr_post['user'] = $user_name;
+                $arr_post['image'] = $boarding->images;
+                $arr_post['price'] = $boarding->price;
+                $arr_post['area'] = $boarding->area;
+                $arr_post['created_at'] = $post->created_at;
+                $arr_post['status_review'] = $post->status_review;
+                $arr_post['time_display'] = $post->time_display;
+                $response[] = $arr_post;
+            }
         }
         return response()->json([
-            $response
+           $response,
+
+
         ]);
 
     }

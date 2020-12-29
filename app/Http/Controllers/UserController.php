@@ -58,7 +58,7 @@ class UserController extends Controller
         $address_json=Address::find($user->address_id);
         $address = $address_json->number . "," . $address_json->street . "," . $address_json->wards . "," . $address_json->district . "," . $address_json->provinces;
         return response()->json([
-            'user:' => $user,
+            'user' => $user,
             'address' => $address,
         ]);
     }
@@ -82,8 +82,8 @@ class UserController extends Controller
             $address_json=Address::find($user->address_id);
             $address = $address_json->number . "," . $address_json->street . "," . $address_json->wards . "," . $address_json->district . "," . $address_json->provinces;
             return response()->json([
-                'user:' => $user,
-                'role:' => $role,
+                'user' => $user,
+                'role' => $role,
                 'address:' => $address,
             ]);
         }
