@@ -100,8 +100,6 @@ Route::group(['prefix'=>'post'], function () {
     Route::get('/recent_posts',[PostController::class, 'getRecentPosts']);
     //Đổi trạng thái phòng trọ và post
     Route::post('/{id}/upload_boarding',[PostController::class, 'UploadBoarding']);
-    //Phê duyệt bài post
-    Route::post('/{id}/approval_post',[PostController::class, 'approvalPost']);
     //Lấy ds bài post đã được phê duyệt
     Route::get('/approved_post',[PostController::class, 'getApprovedPost']);
     //Lấy ds bài post đã được chưa phê duyệt

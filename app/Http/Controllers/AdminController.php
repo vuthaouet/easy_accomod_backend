@@ -83,7 +83,7 @@ class AdminController extends Controller
      */
     public function approvalPost($id)
     {
-        if (auth('api')->check()  && auth('api')->user() ->role_id == 1) {
+        if (auth('api')->check()  && auth('api')->user()->role_id == 1) {
             $post = Post::find($id);
             $post->status_review = 1;
             $post->time_display = Carbon::now()->addDays($post->number_date);
@@ -98,7 +98,7 @@ class AdminController extends Controller
         } else {
             return response()->json([
                 'message' => 'Bạn không có quyền phê duyệt!',
-
+                'user' => auth('api')->user()
             ], 401);
         }
     }
