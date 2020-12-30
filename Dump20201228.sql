@@ -73,32 +73,32 @@ INSERT INTO `boarding_furnitures` VALUES (1,1,20),(2,2,21),(3,3,21),(4,4,21),(5,
 UNLOCK TABLES;
 
 --
--- Table structure for table `boarding_palce_arounds`
+-- Table structure for table `boarding_place_arounds`
 --
 
-DROP TABLE IF EXISTS `boarding_palce_arounds`;
+DROP TABLE IF EXISTS `boarding_place_arounds`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `boarding_palce_arounds` (
+CREATE TABLE `boarding_place_arounds` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `palce_around_id` int(10) unsigned NOT NULL,
+  `place_around_id` int(10) unsigned NOT NULL,
   `boarding_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `boarding_palce_arounds_boarding_id_foreign` (`boarding_id`),
-  KEY `boarding_palce_arounds_palce_around_id_foreign` (`palce_around_id`),
-  CONSTRAINT `boarding_palce_arounds_boarding_id_foreign` FOREIGN KEY (`boarding_id`) REFERENCES `boardings` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `boarding_palce_arounds_palce_around_id_foreign` FOREIGN KEY (`palce_around_id`) REFERENCES `place_arounds` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  KEY `boarding_place_arounds_boarding_id_foreign` (`boarding_id`),
+  KEY `boarding_place_arounds_place_around_id_foreign` (`place_around_id`),
+  CONSTRAINT `boarding_place_arounds_boarding_id_foreign` FOREIGN KEY (`boarding_id`) REFERENCES `boardings` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `boarding_place_arounds_place_around_id_foreign` FOREIGN KEY (`place_around_id`) REFERENCES `place_arounds` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=67 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `boarding_palce_arounds`
+-- Dumping data for table `boarding_place_arounds`
 --
 
-LOCK TABLES `boarding_palce_arounds` WRITE;
-/*!40000 ALTER TABLE `boarding_palce_arounds` DISABLE KEYS */;
-INSERT INTO `boarding_palce_arounds` VALUES (1,1,3),(2,1,4),(3,1,5),(4,1,6),(5,1,7),(6,1,8),(7,1,9),(8,1,10),(9,1,11),(10,1,12),(11,2,13),(12,3,13),(13,2,14),(14,3,14),(18,2,15),(19,3,15),(23,2,16),(24,3,16),(25,2,17),(26,3,17),(27,2,18),(28,3,18),(29,2,19),(30,3,19),(31,2,20),(32,3,20),(33,2,21),(34,3,21),(35,2,22),(36,3,22),(37,2,23),(38,3,23),(39,2,23),(40,3,23),(41,2,23),(42,3,23),(43,2,23),(44,3,23),(45,2,23),(46,3,23),(47,2,24),(48,3,24),(49,2,25),(50,3,25),(51,2,26),(52,3,26),(53,2,27),(54,3,27),(55,2,28),(56,3,28),(57,2,29),(58,3,29),(59,2,30),(60,3,30),(61,2,31),(62,3,31),(63,2,32),(64,3,32),(65,2,33),(66,3,33);
-/*!40000 ALTER TABLE `boarding_palce_arounds` ENABLE KEYS */;
+LOCK TABLES `boarding_place_arounds` WRITE;
+/*!40000 ALTER TABLE `boarding_place_arounds` DISABLE KEYS */;
+INSERT INTO `boarding_place_arounds` VALUES (1,1,3),(2,1,4),(3,1,5),(4,1,6),(5,1,7),(6,1,8),(7,1,9),(8,1,10),(9,1,11),(10,1,12),(11,2,13),(12,3,13),(13,2,14),(14,3,14),(18,2,15),(19,3,15),(23,2,16),(24,3,16),(25,2,17),(26,3,17),(27,2,18),(28,3,18),(29,2,19),(30,3,19),(31,2,20),(32,3,20),(33,2,21),(34,3,21),(35,2,22),(36,3,22),(37,2,23),(38,3,23),(39,2,23),(40,3,23),(41,2,23),(42,3,23),(43,2,23),(44,3,23),(45,2,23),(46,3,23),(47,2,24),(48,3,24),(49,2,25),(50,3,25),(51,2,26),(52,3,26),(53,2,27),(54,3,27),(55,2,28),(56,3,28),(57,2,29),(58,3,29),(59,2,30),(60,3,30),(61,2,31),(62,3,31),(63,2,32),(64,3,32),(65,2,33),(66,3,33);
+/*!40000 ALTER TABLE `boarding_place_arounds` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -302,7 +302,7 @@ CREATE TABLE `migrations` (
 
 LOCK TABLES `migrations` WRITE;
 /*!40000 ALTER TABLE `migrations` DISABLE KEYS */;
-INSERT INTO `migrations` VALUES (1,'2014_10_12_100000_create_password_resets_table',1),(2,'2019_08_19_000000_create_failed_jobs_table',1),(3,'2020_11_10_074538_create_addresses_table',1),(4,'2020_11_10_074920_create_roles_table',1),(5,'2020_11_10_074921_create_users_table',1),(6,'2020_11_12_001927_create_type_boardings_table',1),(7,'2020_11_12_002102_create_place_arounds_table',1),(8,'2020_11_12_002220_create_boardings_table',1),(9,'2020_11_12_004030_create_posts_table',1),(10,'2020_11_12_004625_create_furniture_table',1),(11,'2020_11_12_004856_create_boarding_furnitures',1),(12,'2020_11_12_005739_create_like_post',1),(13,'2020_11_12_010104_create_seen_posts',1),(14,'2020_11_12_010335_create_payments',1),(15,'2020_11_12_010716_create_reports',1),(16,'2020_11_12_011136_create_comments',1),(17,'2020_11_12_011642_create_messages',1),(18,'2020_11_12_011858_create_notifications',1),(19,'2016_06_01_000001_create_oauth_auth_codes_table',2),(20,'2016_06_01_000002_create_oauth_access_tokens_table',2),(21,'2016_06_01_000003_create_oauth_refresh_tokens_table',2),(22,'2016_06_01_000004_create_oauth_clients_table',2),(23,'2016_06_01_000005_create_oauth_personal_access_clients_table',2),(24,'2020_10_12_100000_create_password_resets_table',3),(25,'2020_12_26_030728_create_boarding_palce_arounds_table',4),(26,'2020_12_26_030729_create_boarding_palce_arounds_table',5),(27,'2020_12_27_072920_add_column_slug_table_motelroom',6),(28,'2020_12_27_072920_add_column_slug_table_post',7),(29,'2020_12_27_084140_create_visits_table',7);
+INSERT INTO `migrations` VALUES (1,'2014_10_12_100000_create_password_resets_table',1),(2,'2019_08_19_000000_create_failed_jobs_table',1),(3,'2020_11_10_074538_create_addresses_table',1),(4,'2020_11_10_074920_create_roles_table',1),(5,'2020_11_10_074921_create_users_table',1),(6,'2020_11_12_001927_create_type_boardings_table',1),(7,'2020_11_12_002102_create_place_arounds_table',1),(8,'2020_11_12_002220_create_boardings_table',1),(9,'2020_11_12_004030_create_posts_table',1),(10,'2020_11_12_004625_create_furniture_table',1),(11,'2020_11_12_004856_create_boarding_furnitures',1),(12,'2020_11_12_005739_create_like_post',1),(13,'2020_11_12_010104_create_seen_posts',1),(14,'2020_11_12_010335_create_payments',1),(15,'2020_11_12_010716_create_reports',1),(16,'2020_11_12_011136_create_comments',1),(17,'2020_11_12_011642_create_messages',1),(18,'2020_11_12_011858_create_notifications',1),(19,'2016_06_01_000001_create_oauth_auth_codes_table',2),(20,'2016_06_01_000002_create_oauth_access_tokens_table',2),(21,'2016_06_01_000003_create_oauth_refresh_tokens_table',2),(22,'2016_06_01_000004_create_oauth_clients_table',2),(23,'2016_06_01_000005_create_oauth_personal_access_clients_table',2),(24,'2020_10_12_100000_create_password_resets_table',3),(25,'2020_12_26_030728_create_boarding_place_arounds_table',4),(26,'2020_12_26_030729_create_boarding_place_arounds_table',5),(27,'2020_12_27_072920_add_column_slug_table_motelroom',6),(28,'2020_12_27_072920_add_column_slug_table_post',7),(29,'2020_12_27_084140_create_visits_table',7);
 /*!40000 ALTER TABLE `migrations` ENABLE KEYS */;
 UNLOCK TABLES;
 

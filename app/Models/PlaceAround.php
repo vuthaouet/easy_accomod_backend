@@ -12,6 +12,6 @@ class PlaceAround extends Model
     public $timestamps = false;
     public function boardings()
     {
-        return $this->belongsToMany(Boarding::class,'boarding_palce_arounds','palce_around_id','boarding_id');
+        return $this->belongsToMany(Boarding::class,'boarding_place_arounds','palce_around_id','boarding_id');
     }
 }

@@ -95,10 +95,10 @@ class PostController extends Controller
                     $boarding->save();
 
                     //Tìm hoặc tạo mới địa điểm gần trường
-                    $arr_palce_arounds_name = explode(",", $request->palce_arounds);
-                    foreach ($arr_palce_arounds_name as $palce_around_name) {
-                        $palce_around = PlaceAround::firstOrCreate(['name' => $palce_around_name]);
-                        $palce_around->boardings()->attach($boarding->id);
+                    $arr_place_arounds_name = explode(",", $request->place_around);
+                    foreach ($arr_place_arounds_name as $place_around_name) {
+                        $place_around = PlaceAround::firstOrCreate(['name' => $place_around_name]);
+                        $place_around->boardings()->attach($boarding->id);
                     }
                     // Tìm hoặc tạo mới tiện tích
                     $arr_furniturs_name = explode(",", $request->furniture);
@@ -194,21 +194,21 @@ class PostController extends Controller
 
 //                Xóa tiện ích và những địa chỉ công cộng xung quanh
                 $arr_furnitures_id = [];
-                $arr_palce_arounds_id = [];
+                $arr_place_arounds_id = [];
                 foreach ($boarding->furnitures as $furniture) {
                     $arr_furnitures_id[] = $furniture->name;
                 }
-                foreach ($boarding->palce_arounds as $palce_around) {
-                    $arr_palce_arounds_id[] = $palce_around->name;
+                foreach ($boarding->place_arounds as $place_around) {
+                    $arr_place_arounds_id[] = $place_around->name;
                 }
 //                $boarding->furnitures()->detach();
                 $boarding->furnitures()->detach($arr_furnitures_id);
-                $boarding->palce_arounds()->detach($arr_furnitures_id);
+                $boarding->place_arounds()->detach($arr_furnitures_id);
                 //Tìm hoặc tạo mới địa điểm gần trường
-                $arr_palce_arounds_name = explode(",", $request->palce_arounds);
-                foreach ($arr_palce_arounds_name as $palce_around_name) {
-                    $palce_around = PlaceAround::firstOrCreate(['name' => $palce_around_name]);
-                    $palce_around->boardings()->attach($boarding->id);
+                $arr_place_arounds_name = explode(",", $request->place_arounds);
+                foreach ($arr_place_arounds_name as $place_around_name) {
+                    $place_around = PlaceAround::firstOrCreate(['name' => $place_around_name]);
+                    $place_around->boardings()->attach($boarding->id);
                 }
                 // Tìm hoặc tạo mới tiện tích
                 $arr_furniturs_name = explode(",", $request->furniture);
@@ -273,7 +273,7 @@ class PostController extends Controller
         }
 
         $arr_furnitures = [];
-        $arr_palce_arounds = [];
+        $arr_place_arounds = [];
         $user_post = User::find($post->user_id);
         $boarding = Boarding::find($post->boarding_id);
         $address_json = Address::find($boarding->address_id);
@@ -285,13 +285,13 @@ class PostController extends Controller
         foreach ($boarding->furnitures as $furniture) {
             $arr_furnitures[] = $furniture->name;
         }
-        foreach ($boarding->palce_arounds as $palce_around) {
-            $arr_palce_arounds[] = $palce_around->name;
+        foreach ($boarding->place_arounds as $place_around) {
+            $arr_place_arounds[] = $place_around->name;
         }
         $boarding['type_boarding'] = $type_boardings;
         $boarding['address'] = $address;
         $boarding['furnitures'] = $arr_furnitures;
-        $boarding['places_around'] = $arr_palce_arounds;
+        $boarding['places_around'] = $arr_place_arounds;
         $arr_post['post'] = $post;
         $arr_post['user'] = $user_post;
         $arr_post['boarding'] = $boarding;
@@ -347,7 +347,7 @@ class PostController extends Controller
             ]);
         }
         $arr_furnitures = [];
-        $arr_palce_arounds = [];
+        $arr_place_arounds = [];
         $user_post = User::find($post->user_id);
         $boarding = Boarding::find($post->boarding_id);
         $address_json = Address::find($boarding->address_id);
@@ -357,15 +357,15 @@ class PostController extends Controller
         foreach ($boarding->furnitures as $furniture) {
             $arr_furnitures[] = $furniture->name;
         }
-        foreach ($boarding->palce_arounds as $palce_around) {
-            $arr_palce_arounds[] = $palce_around->name;
+        foreach ($boarding->place_arounds as $place_around) {
+            $arr_place_arounds[] = $place_around->name;
         }
 
 
         $boarding['type_boarding'] = $type_boardings;
         $boarding['address'] = $address;
         $boarding['furnitures'] = $arr_furnitures;
-        $boarding['palce_around'] = $arr_palce_arounds;
+        $boarding['place_around'] = $arr_place_arounds;
         $arr_post['post'] = $post;
         $arr_post['user'] = $user_post;
         $arr_post['boarding'] = $boarding;

@@ -21,8 +21,8 @@ class Boarding extends Model
     {
         return $this->belongsToMany(Furniture::class,'boarding_furnitures','boarding_id','furniture_id');
     }
-    public function palce_arounds()
+    public function place_arounds()
     {
-        return $this->belongsToMany(PlaceAround::class,'boarding_palce_arounds','boarding_id','palce_around_id');
+        return $this->belongsToMany(PlaceAround::class,'boarding_place_arounds','boarding_id','palce_around_id');
     }
 }

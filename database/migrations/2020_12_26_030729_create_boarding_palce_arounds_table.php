@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateBoardingPalceAroundsTable extends Migration
+class CreateBoardingplaceAroundsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,11 @@ class CreateBoardingPalceAroundsTable extends Migration
      */
     public function up()
     {
-        Schema::create('boarding_palce_arounds', function (Blueprint $table) {
+        Schema::create('boarding_place_arounds', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('palce_around_id')->unsigned();
+            $table->integer('place_around_id')->unsigned();
             $table->integer('boarding_id')->unsigned();
-            $table->foreign('palce_around_id')->references('id')->on('place_arounds')->onDelete('cascade');;
+            $table->foreign('place_around_id')->references('id')->on('place_arounds')->onDelete('cascade');;
             $table->foreign('boarding_id')->references('id')->on('boardings')->onDelete('cascade');;
 
         });
@@ -30,6 +30,6 @@ class CreateBoardingPalceAroundsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('boarding_palce_arounds');
+        Schema::dropIfExists('boarding_place_arounds');
     }
 }

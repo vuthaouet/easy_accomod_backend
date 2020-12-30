@@ -196,7 +196,7 @@ class AdminController extends Controller
      */
     public function approvalUser($id)
     {
-        if (auth('api')->check()  && auth('api')->user() ->role_id == 1){
+        if (auth('api')->check()  && auth('api')->user()->role_id == 1){
             $user = User::find($id);
             $user->status = 1;
             $user->save();
@@ -208,7 +208,7 @@ class AdminController extends Controller
         else{
             return response()->json([
                 'message' => 'Bạn không có quyền phê duyệt!',
-
+                'user' => auth('api')->user()
             ], 201);
         }
     }
